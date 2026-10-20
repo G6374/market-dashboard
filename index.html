@@ -163,9 +163,9 @@
 <script type="application/json" id="market-data">{
   "meta": {
     "title": "市场动态看板",
-    "updatedAt": "2026-10-20",
+    "updatedAt": "2026-10-19",
     "isPrototype": false,
-    "prototypeNote": "每日 23:00 自动更新；数据来自各厂商官网 Newsroom 与权威行业媒体（TrendForce 等）官方来源。周总结每周日生成，月总结每月最后一天生成；历史保留 30 天。"
+    "prototypeNote": "每日北京时间 24:00（次日 00:00）自动更新；数据来自各厂商官网 Newsroom 与权威行业媒体（TrendForce 等）官方来源，严格只收录当日发布的资讯。周总结每周日 24:00 生成，月总结每月最后一天 24:00 生成；历史保留 30 天。"
   },
   "glossary": {
     "AI": "人工智能（Artificial Intelligence），让机器模拟人类智能、完成理解、判断与生成任务的技术。",
@@ -224,176 +224,44 @@
     "CXL": "Compute Express Link，一种用于 CPU 与内存、加速器之间高速互联的开放标准，常用于 AI 服务器的内存池化。",
     "EFLOPS": "每秒一百亿亿次浮点运算，比 PFLOPS 更大的算力单位，常用于描述超节点级总算力。",
     "RTX Spark": "英伟达推出的融合游戏、创作与 AI 的超级芯片 / 整机，主打本地大模型运行与统一内存。",
-    "AI工厂": "用规模化算力持续“生产”大模型 Token 与智能体的基础设施与企业形态。"
+    "AI工厂": "用规模化算力持续“生产”大模型 Token 与智能体的基础设施与企业形态。",
+    "OpenAI": "美国人工智能公司，开发了 GPT 系列大模型，其 API 供开发者调用以生成文字、代码等内容。",
+    "Anthropic": "美国人工智能公司，开发了 Claude 系列大模型，主打安全与可控的 AI 助手。",
+    "GPT": "OpenAI 推出的生成式预训练大模型系列，是当前应用最广的大模型之一。",
+    "Claude": "Anthropic 推出的大模型系列，常用于对话、写作与代码等任务。",
+    "文心": "百度推出的大模型系列（如文心一言），以中文能力见长，可通过百度智能云千帆调用。",
+    "通义": "阿里云推出的大模型系列（如通义千问），可通过阿里云百炼平台调用。",
+    "GLM": "智谱 AI 推出的大模型系列（如 ChatGLM），支持对话与智能体等能力。",
+    "NVIDIA": "英伟达，美国 GPU 芯片巨头，是当前 AI 算力的主要供应商（详见“英伟达(NVIDIA)”）。",
+    "Intel": "英特尔，美国芯片公司，生产 CPU 等，亦在拓展 AI 算力产品（详见“Intel(英特尔)”）。",
+    "谷歌(Google)": "美国科技公司，开发了 Gemini 等大模型。",
+    "微软(Microsoft)": "美国科技公司，与 OpenAI 深度合作，将 GPT 能力接入其产品。",
+    "京东工业": "京东面向工业品的采购与供应链服务平台，属京东政企业务板块。"
   },
   "sections": [
     {
       "id": "storage",
       "name": "存储市场",
       "accent": "#2563eb",
-      "dates": {
-        "2026-10-20": {
-          "summary": "近期存储市场动态主要集中在存储价格调整、产能扩张和新技术研发等方面。存储厂商和材料供应商纷纷调整价格，以应对成本上升和市场需求变化。同时，多家企业正在扩大产能，以满足未来市场的需求。",
-          "items": [
-            {
-              "title": "ASE 提升先进封装报价",
-              "source": "TrendForce 集邦咨询",
-              "url": "https://www.trendforce.com/news/2026/07/01/news-ase-reportedly-raises-advanced-packaging-quotes-by-more-than-20-in-latest-ai-driven-price-hike/",
-              "excerpt": "ASE 报告称，由于 AI 驱动的价格上涨，其先进封装报价上调超过 20%。这反映了存储市场成本上升的趋势。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "三星重启 1.4nm 制程推进",
-              "source": "TrendForce 集邦咨询",
-              "url": "https://www.trendforce.com/news/2026/07/01/news-musks-terafab-lands-first-major-hire-as-18-year-intel-veteran-with-18a-experience-joins-as-director/",
-              "excerpt": "三星计划重启 1.4nm 制程技术，目标在 2029 年实现大规模生产，以缩小与台积电和英特尔的差距。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "SK 海力士和三星扩大产能",
-              "source": "TrendForce 集邦咨询",
-              "url": "https://www.trendforce.com/news/2026/07/01/insights-memory-spot-price-update-dram-spot-prices-see-gains-in-low-density-ddr4-and-ddr3-amid-sideways-market/",
-              "excerpt": "SK 海力士和三星计划进行 800 万亿韩元的投资，扩大芯片制造工具的供应，这可能会对台积电和英特尔等竞争对手产生压力。",
-              "vendor": "",
-              "region": ""
-            }
-          ]
-        }
-      }
+      "dates": {}
     },
     {
       "id": "token",
       "name": "Token 市场",
       "accent": "#7c3aed",
-      "dates": {
-        "2026-10-20": {
-          "summary": "近期，OpenAI 和 Anthropic 在生成式人工智能领域持续发力，分别在编程语言支持、客户支持以及政策更新等方面推出了一系列新举措。",
-          "items": [
-            {
-              "title": "如何为 Itaú 的整个客户群构建生成式 AI",
-              "source": "OpenAI 官方",
-              "url": "https://openai.com/index/low-resource-programming-languages",
-              "excerpt": "Itaú 正在利用生成式 AI 提升客户服务体验，通过 AI 技术更好地满足客户需求。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Anthropic 宣布投资公共利益基金",
-              "source": "OpenAI 官方",
-              "url": "https://openai.com/index/itau-generative-ai",
-              "excerpt": "Anthropic 专注于公共利益，宣布设立公共利益基金，旨在推动社会进步和公平。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Anthropic 更新使用政策",
-              "source": "Anthropic 官方",
-              "url": "https://support.claude.com/en/articles/9015913-how-to-get-support",
-              "excerpt": "Anthropic 更新了其使用政策，强调对生成式 AI 的负责任使用，确保技术的安全和伦理。",
-              "vendor": "",
-              "region": ""
-            }
-          ]
-        }
-      }
+      "dates": {}
     },
     {
       "id": "compute",
       "name": "算力市场",
       "accent": "#0d9488",
-      "dates": {
-        "2026-10-20": {
-          "summary": "国外厂商：NVIDIA 和 AMD 近期在高性能计算和人工智能领域持续发力，分别与多家知名企业达成合作，推动技术创新和应用落地。\n国内厂商：近期，国内算力市场活跃，寒武纪和摩尔线程等厂商持续推出新产品，致力于提升智能加速卡和AI芯片的性能。",
-          "items": [
-            {
-              "title": "英伟达与沃尔沃汽车深化合作，推进自动驾驶技术",
-              "source": "NVIDIA 英伟达",
-              "url": "https://nvidianews.nvidia.com/in-the-news",
-              "excerpt": "英伟达与沃尔沃汽车扩大了合作范围，共同致力于安全的自动驾驶技术开发，预计在未来十年取得显著进展。",
-              "vendor": "英伟达 NVIDIA",
-              "region": "foreign"
-            },
-            {
-              "title": "英伟达与梅赛德斯-奔驰深化战略合作，推动自动驾驶技术",
-              "source": "NVIDIA 英伟达",
-              "url": "https://nvidianews.nvidia.com/online-press-kit",
-              "excerpt": "英伟达与梅赛德斯-奔驰进一步加强了战略合作伙伴关系，旨在未来十年内推进安全的高级自动驾驶技术。",
-              "vendor": "英伟达 NVIDIA",
-              "region": "foreign"
-            },
-            {
-              "title": "英伟达与Adobe扩大合作，加速创意内容生产",
-              "source": "NVIDIA 英伟达",
-              "url": "https://nvidianews.nvidia.com/news/nvidia-runs-record-simulation-of-fault-tolerant-quantum-computing-at-julich-supercomputing-centre",
-              "excerpt": "英伟达与Adobe深化了合作，旨在通过英伟达的技术加速创意内容的生产过程，提升效率和质量。",
-              "vendor": "英伟达 NVIDIA",
-              "region": "foreign"
-            },
-            {
-              "title": "寒武纪 MLU370-X4智能加速卡",
-              "source": "华为昇腾",
-              "url": "https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44030702005057",
-              "excerpt": "寒武纪推出MLU370-X4智能加速卡，进一步丰富其产品线，提升智能计算能力。",
-              "vendor": "华为昇腾",
-              "region": "domestic"
-            },
-            {
-              "title": "寒武纪 Cambricon NeuWare",
-              "source": "寒武纪",
-              "url": "https://www.cambricon.com/index.php?m=content&c=index&a=lists&catid=365",
-              "excerpt": "寒武纪发布Cambricon NeuWare，提供一站式智能计算解决方案，助力各行各业智能化转型。",
-              "vendor": "寒武纪",
-              "region": "domestic"
-            },
-            {
-              "title": "摩尔线程",
-              "source": "寒武纪",
-              "url": "https://www.cambricon.com/index.php?m=content&c=index&a=lists&catid=371",
-              "excerpt": "摩尔线程获得公安备案号，表明其业务合规性增强，未来有望在智能计算领域取得更大突破。",
-              "vendor": "寒武纪",
-              "region": "domestic"
-            }
-          ]
-        }
-      }
+      "dates": {}
     },
     {
       "id": "jd",
       "name": "京东政企市场",
       "accent": "#dc2626",
-      "dates": {
-        "2026-10-20": {
-          "summary": "京东政企市场近期的官方动态主要集中在企业业务的合规认证和云服务解决方案上，展现了京东在政务和企业服务领域的专业性和技术实力。",
-          "items": [
-            {
-              "title": "经营性网站备案中心",
-              "source": "京东企业业务",
-              "url": "https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11000002000088",
-              "excerpt": "京东企业业务已通过经营性网站备案，确保其服务的合法性和安全性，为政企客户提供可靠的服务保障。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "云数据库 PostgreSQL",
-              "source": "京东企业业务",
-              "url": "https://www.hd315.gov.cn/beian/view.asp?bianhao=010202007080200026",
-              "excerpt": "京东云推出了云数据库 PostgreSQL，为企业提供高性能、高可用性的数据库服务，助力企业高效管理数据。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "查看全部解决方案",
-              "source": "京东云",
-              "url": "https://docs.jdcloud.com/cn/jdaip/tokenplan-overview",
-              "excerpt": "京东云提供了多种解决方案，帮助企业解决在云计算、大数据等方面的需求，提升企业的信息化水平。",
-              "vendor": "",
-              "region": ""
-            }
-          ]
-        }
-      }
+      "dates": {}
     },
     {
       "id": "review",
@@ -481,10 +349,11 @@
 
     document.getElementById('footer').textContent =
       (DATA.meta.isPrototype ? DATA.meta.prototypeNote + ' · ' : '') +
-      '本看板所有动态均可点击“查看来源”跳转至官方权威网站。每日 23:00 更新；周总结每周日生成，月总结每月最后一天生成；历史保留 30 天。';
+      '本看板所有动态均可点击“查看来源”跳转至官方权威网站。每日北京时间 24:00 更新（仅收录当日发布的资讯）；周总结每周日 24:00 生成，月总结每月最后一天 24:00 生成；历史保留 30 天。';
 
     sel.onchange = ()=>renderGrid(sel.value);
     renderGrid(dates[0]);
+    annotatedCache = new Set();   // 总结模块独立计"首次出现"
     renderReview();
     renderGlossary();
   }
