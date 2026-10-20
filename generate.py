@@ -57,20 +57,25 @@ FOCUS = {
                       "合作与客户落地、财报与业绩动态。",
     "算力市场·国内厂商": "华为昇腾、寒武纪、摩尔线程、沐曦、壁仞、天数智芯 等国产 AI 芯片厂商的新品发布、"
                       "量产、技术突破、合作与融资、政策与业绩动态。",
-    "京东政企市场": "京东面向政府与企业的业务（京东企业业务、京东云、京东工业等）的政企客户、解决方案、"
+    "京东政企": "京东面向政府与企业的业务（京东企业业务、京东云、京东工业等）的政企客户、解决方案、"
                  "合作中标、行业落地动态。",
 }
 
-# ---- 数据源（权威官方 / 官网 Newsroom）----
+# ---- 数据源（权威官方 / 官网 Newsroom；严格只取发布日==目标日当天的内容）----
 SOURCES = {
     "storage": [
         {"type": "rss", "url": "https://www.trendforce.com/news/feed/", "source": "TrendForce 集邦咨询"},
-        {"type": "rss", "url": "https://www.dramexchange.com/feed/", "source": "DRAMeXchange"},
-        {"type": "html", "url": "https://www.trendforce.cn/news/", "source": "TrendForce 集邦咨询（中文站）"},
+        {"type": "rss", "url": "https://news.skhynix.com/feed/", "source": "SK 海力士"},
     ],
     "token": [
         {"type": "rss", "url": "https://openai.com/news/rss.xml", "source": "OpenAI 官方（GPT）"},
         {"type": "html", "url": "https://www.anthropic.com/news", "source": "Anthropic 官方（Claude）"},
+        {"type": "rss", "url": "https://blog.google/technology/ai/rss/", "source": "Google 官方博客（Gemini）"},
+        {"type": "rss", "url": "https://azure.microsoft.com/en-us/blog/feed/", "source": "微软 Azure 官方博客"},
+        {"type": "rss", "url": "https://ai.meta.com/blog/rss/", "source": "Meta AI 官方博客"},
+        {"type": "rss", "url": "https://mistral.ai/news/rss.xml", "source": "Mistral AI 官方"},
+        {"type": "rss", "url": "https://x.ai/blog/rss.xml", "source": "xAI 官方（Grok）"},
+        {"type": "rss", "url": "https://cohere.com/blog/rss.xml", "source": "Cohere 官方"},
         {"type": "html", "url": "https://cloud.baidu.com/product/wenxinworkshop", "source": "百度智能云千帆（文心）"},
         {"type": "html", "url": "https://bailian.aliyun.com/", "source": "阿里云百炼（通义）"},
         {"type": "html", "url": "https://open.bigmodel.cn/", "source": "智谱 AI（GLM）"},
@@ -87,11 +92,64 @@ SOURCES = {
         {"type": "html", "url": "https://www.metax-tech.com/", "source": "沐曦股份", "vendor": "沐曦股份", "region": "domestic"},
         {"type": "html", "url": "https://www.birentech.com/", "source": "壁仞科技", "vendor": "壁仞科技", "region": "domestic"},
         {"type": "html", "url": "https://www.iluvatar.com/", "source": "天数智芯", "vendor": "天数智芯", "region": "domestic"},
+        {"type": "html", "url": "https://www.enflame-tech.com/", "source": "燧原科技", "vendor": "燧原科技", "region": "domestic"},
+        {"type": "html", "url": "https://www.kunlunxin.com/", "source": "昆仑芯", "vendor": "昆仑芯", "region": "domestic"},
     ],
     "jd": [
         {"type": "html", "url": "https://e.jd.com/", "source": "京东企业业务"},
         {"type": "html", "url": "https://www.jdcloud.com/", "source": "京东云"},
         {"type": "html", "url": "https://www.jd.com/", "source": "京东"},
+        {"type": "html", "url": "https://news.jd.com/", "source": "京东黑板报（官方资讯）"},
+        {"type": "html", "url": "https://www.jdl.com/", "source": "京东物流"},
+    ],
+}
+
+# ---- 官方关注渠道（某板块当日无更新时展示，供用户自行关注；均为权威官方站点）----
+CHANNELS = {
+    "storage": [
+        {"name": "TrendForce 集邦咨询", "url": "https://www.trendforce.com/news/"},
+        {"name": "DRAMeXchange", "url": "https://www.dramexchange.com/"},
+        {"name": "三星 Samsung Newsroom", "url": "https://news.samsung.com/global/"},
+        {"name": "SK 海力士", "url": "https://news.skhynix.com/"},
+        {"name": "美光 Micron", "url": "https://www.micron.com/about/newsroom"},
+        {"name": "西部数据 Western Digital", "url": "https://blog.westerndigital.com/"},
+        {"name": "铠侠 Kioxia", "url": "https://www.kioxia.com/en-us/"},
+    ],
+    "token": [
+        {"name": "OpenAI 官方（GPT）", "url": "https://openai.com/news"},
+        {"name": "Anthropic 官方（Claude）", "url": "https://www.anthropic.com/news"},
+        {"name": "Google 官方博客（Gemini）", "url": "https://blog.google/technology/ai/"},
+        {"name": "微软 Azure 官方博客", "url": "https://azure.microsoft.com/en-us/blog/"},
+        {"name": "Meta AI 官方博客", "url": "https://ai.meta.com/blog/"},
+        {"name": "Mistral AI 官方", "url": "https://mistral.ai/news"},
+        {"name": "xAI 官方（Grok）", "url": "https://x.ai/blog"},
+        {"name": "Cohere 官方", "url": "https://cohere.com/blog"},
+        {"name": "百度智能云千帆（文心）", "url": "https://cloud.baidu.com/product/wenxinworkshop"},
+        {"name": "阿里云百炼（通义）", "url": "https://bailian.aliyun.com/"},
+        {"name": "智谱 AI（GLM）", "url": "https://open.bigmodel.cn/"},
+    ],
+    "compute_foreign": [
+        {"name": "NVIDIA 英伟达", "url": "https://nvidianews.nvidia.com/"},
+        {"name": "AMD 官方", "url": "https://www.amd.com/en/newsroom.html"},
+        {"name": "Intel 英特尔", "url": "https://newsroom.intel.com/"},
+    ],
+    "compute_domestic": [
+        {"name": "华为昇腾", "url": "https://www.hiascend.com/"},
+        {"name": "寒武纪", "url": "https://www.cambricon.com/"},
+        {"name": "摩尔线程", "url": "https://www.mthreads.com/"},
+        {"name": "沐曦股份", "url": "https://www.metax-tech.com/"},
+        {"name": "壁仞科技", "url": "https://www.birentech.com/"},
+        {"name": "天数智芯", "url": "https://www.iluvatar.com/"},
+        {"name": "燧原科技", "url": "https://www.enflame-tech.com/"},
+        {"name": "昆仑芯", "url": "https://www.kunlunxin.com/"},
+    ],
+    "jd": [
+        {"name": "京东企业业务", "url": "https://e.jd.com/"},
+        {"name": "京东云", "url": "https://www.jdcloud.com/"},
+        {"name": "京东", "url": "https://www.jd.com/"},
+        {"name": "京东黑板报（官方资讯）", "url": "https://news.jd.com/"},
+        {"name": "京东物流", "url": "https://www.jdl.com/"},
+        {"name": "京东工业", "url": "https://www.jd.com/"},
     ],
 }
 
@@ -101,7 +159,7 @@ NEWS_HREF = re.compile(
 )
 SECTION_NAMES = {
     "storage": "存储市场", "token": "Token 市场",
-    "compute": "算力市场", "jd": "京东政企市场",
+    "compute": "算力市场", "jd": "京东政企",
 }
 DATE_RES = [
     re.compile(r"(\d{4})[-/年.](\d{1,2})[-/月.](\d{1,2})"),
@@ -124,41 +182,48 @@ def extract_date(text):
 
 # ---------- 抓取（严格只取"目标日期"当天发布）----------
 def fetch_rss(src, limit=12):
+    # 先经 requests 带超时下载，再交给 feedparser 解析，避免无响应源拖垮整个任务
+    raw = None
     for attempt in range(2):
         try:
-            d = feedparser.parse(src["url"])
-            cands = []
-            for e in (d.entries or []):
-                title = (e.title or "").strip()
-                link = (e.link or "").strip()
-                if not title or not link:
-                    continue
-                pub = e.get("published_parsed") or e.get("updated_parsed")
-                pdate = None
-                if pub:
-                    try:
-                        pdate = datetime.datetime(*pub[:6], tzinfo=datetime.timezone.utc).astimezone(TZ).date()
-                    except Exception:
-                        pdate = None
-                # 部分源 pubDate 损坏（如统一返回旧日期），改用 URL 路径中的日期兜底
-                if pdate is None or pdate != BIZ_DATE:
-                    url_date = extract_date(link)
-                    if url_date == BIZ_DATE:
-                        pdate = url_date
-                # 硬性要求：发布日期必须 == 目标日期，否则丢弃（不追溯、不保留无日期项）
-                if pdate != BIZ_DATE:
-                    continue
-                cands.append({"title": title, "url": link, "source": src["source"], "date": pdate})
-                if len(cands) >= limit:
-                    break
-            if cands:
-                return cands
-            if not (d.entries or []):
-                continue  # 偶发空解析，重试一次
-            return []
+            r = requests.get(src["url"], headers={"User-Agent": UA}, timeout=12)
+            if r.status_code == 200 and r.content:
+                raw = r.content
+                break
         except Exception as ex:
-            print(f"  [RSS失败] {src['source']}: {ex}")
-    return []
+            print(f"  [RSS下载失败] {src['source']}: {ex}")
+    if not raw:
+        return []
+    try:
+        d = feedparser.parse(raw)
+    except Exception as ex:
+        print(f"  [RSS解析失败] {src['source']}: {ex}")
+        return []
+    cands = []
+    for e in (d.entries or []):
+        title = (e.title or "").strip()
+        link = (e.link or "").strip()
+        if not title or not link:
+            continue
+        pub = e.get("published_parsed") or e.get("updated_parsed")
+        pdate = None
+        if pub:
+            try:
+                pdate = datetime.datetime(*pub[:6], tzinfo=datetime.timezone.utc).astimezone(TZ).date()
+            except Exception:
+                pdate = None
+        # 部分源 pubDate 损坏（如统一返回旧日期），改用 URL 路径中的日期兜底
+        if pdate is None or pdate != BIZ_DATE:
+            url_date = extract_date(link)
+            if url_date == BIZ_DATE:
+                pdate = url_date
+        # 硬性要求：发布日期必须 == 目标日期，否则丢弃（不追溯、不保留无日期项）
+        if pdate != BIZ_DATE:
+            continue
+        cands.append({"title": title, "url": link, "source": src["source"], "date": pdate})
+        if len(cands) >= limit:
+            break
+    return cands
 
 def fetch_html(src, limit=12):
     try:
@@ -279,12 +344,13 @@ def call_llm(system, user, temperature=0.3):
             print(f"  [LLM 供应商失败 {url[:45]}]: {ex}")
     raise RuntimeError(f"所有 LLM 供应商均失败: {last_err}")
 
-def synthesize(section_label, items):
+def synthesize(section_label, items, channels=None):
     focus = FOCUS.get(section_label, "")
     if not items:
         return {
             "summary": f"今日（{BIZ_STR}）未检索到「{section_label}」的官方更新，可点击下方官方渠道持续关注。",
             "items": [],
+            "channels": channels or [],
         }
     payload = [{"title": i["title"], "source": i["source"], "url": i["url"]} for i in items]
     system = ("你是中国市场动态看板的资深分析师，面向不懂技术的小白用户。"
@@ -321,7 +387,7 @@ def synthesize(section_label, items):
                 "vendor": orig.get("vendor", ""),
                 "region": orig.get("region", ""),
             })
-        return {"summary": summary, "items": out_items}
+        return {"summary": summary, "items": out_items, "channels": channels or []}
     except Exception as ex:
         print(f"  [LLM失败 {section_label}]: {ex}")
         return {
@@ -329,6 +395,7 @@ def synthesize(section_label, items):
             "items": [{"title": i["title"], "source": i["source"], "url": i["url"],
                        "excerpt": "（摘要生成暂不可用，请点击来源查看官方原文）",
                        "vendor": i.get("vendor", ""), "region": i.get("region", "")} for i in items],
+            "channels": channels or [],
         }
 
 # ---------- 周/月总结 ----------
@@ -390,7 +457,8 @@ def main():
         print(f"-- 抓取 {SECTION_NAMES[key]} --")
         items = collect(key)
         items = filter_dead_links(items)          # 发布前链接自检
-        res = synthesize(SECTION_NAMES[key], items)
+        channels = CHANNELS.get(key, [])
+        res = synthesize(SECTION_NAMES[key], items, channels)
         data = ensure_date(data, key, BIZ_STR, res)
     # 算力（国外 + 国内）
     print("-- 抓取 算力市场（国外/国内）--")
@@ -399,13 +467,21 @@ def main():
     f_items = filter_dead_links(f_items)
     d_items = filter_dead_links(d_items)
     print(f"  国外 {len(f_items)} 条 / 国内 {len(d_items)} 条")
-    f_res = synthesize("算力市场·国外厂商", f_items)
-    d_res = synthesize("算力市场·国内厂商", d_items)
+    f_res = synthesize("算力市场·国外厂商", f_items, CHANNELS["compute_foreign"])
+    d_res = synthesize("算力市场·国内厂商", d_items, CHANNELS["compute_domestic"])
     comp_items = f_res["items"] + d_res["items"]
     comp_summary = ("国外厂商：" + f_res["summary"] + "\n国内厂商：" + d_res["summary"]) if (f_items or d_items) else \
                   f"今日（{BIZ_STR}）未检索到算力市场的官方更新，可点击各厂商官方渠道持续关注。"
     compute_sec = next(s for s in data["sections"] if s["id"] == "compute")
-    compute_sec.setdefault("dates", {})[BIZ_STR] = {"summary": comp_summary, "items": comp_items}
+    compute_sec.setdefault("dates", {})[BIZ_STR] = {"summary": comp_summary, "items": comp_items,
+                                                    "channels": CHANNELS["compute_foreign"] + CHANNELS["compute_domestic"]}
+
+    # 写入各板块的官方关注渠道（当日无更新时展示，供用户自行关注）
+    for sec in data["sections"]:
+        if sec.get("type") == "review":
+            continue
+        cid = sec["id"]
+        sec["channels"] = (CHANNELS["compute_foreign"] + CHANNELS["compute_domestic"]) if cid == "compute" else CHANNELS.get(cid, [])
 
     # 周/月总结
     build_review(data)
@@ -428,7 +504,7 @@ def main():
 
 def ensure_date(data, key, date_str, res):
     sec = next(s for s in data["sections"] if s["id"] == key)
-    sec.setdefault("dates", {})[date_str] = {"summary": res["summary"], "items": res["items"]}
+    sec.setdefault("dates", {})[date_str] = res   # res 已含 summary/items/channels
     return data
 
 if __name__ == "__main__":
