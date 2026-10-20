@@ -76,6 +76,11 @@
   }
   .link:hover{text-decoration:underline;}
   .empty{color:var(--muted); font-size:13px; padding:8px 2px;}
+  /* 无更新时的官方关注渠道 */
+  .channels{margin-top:10px; padding:10px 12px; background:#f8fafc; border:1px dashed var(--line); border-radius:10px;}
+  .channels .ch-lbl{display:block; font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; letter-spacing:.5px;}
+  .channels .ch-link{display:inline-block; margin:0 12px 6px 0; color:#2563eb; text-decoration:none; font-size:13px; font-weight:600;}
+  .channels .ch-link:hover{text-decoration:underline;}
   /* 周/月总结面板 */
   .review-wrap{margin-top:22px; background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:18px 20px;}
   .review-head{display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:14px;}
@@ -246,9 +251,69 @@
       "dates": {
         "2026-10-19": {
           "summary": "今日（2026-10-19）未检索到「存储市场」的官方更新，可点击下方官方渠道持续关注。",
-          "items": []
+          "items": [],
+          "channels": [
+            {
+              "name": "TrendForce 集邦咨询",
+              "url": "https://www.trendforce.com/news/"
+            },
+            {
+              "name": "DRAMeXchange",
+              "url": "https://www.dramexchange.com/"
+            },
+            {
+              "name": "三星 Samsung Newsroom",
+              "url": "https://news.samsung.com/global/"
+            },
+            {
+              "name": "SK 海力士",
+              "url": "https://news.skhynix.com/"
+            },
+            {
+              "name": "美光 Micron",
+              "url": "https://www.micron.com/about/newsroom"
+            },
+            {
+              "name": "西部数据 Western Digital",
+              "url": "https://blog.westerndigital.com/"
+            },
+            {
+              "name": "铠侠 Kioxia",
+              "url": "https://www.kioxia.com/en-us/"
+            }
+          ]
         }
-      }
+      },
+      "channels": [
+        {
+          "name": "TrendForce 集邦咨询",
+          "url": "https://www.trendforce.com/news/"
+        },
+        {
+          "name": "DRAMeXchange",
+          "url": "https://www.dramexchange.com/"
+        },
+        {
+          "name": "三星 Samsung Newsroom",
+          "url": "https://news.samsung.com/global/"
+        },
+        {
+          "name": "SK 海力士",
+          "url": "https://news.skhynix.com/"
+        },
+        {
+          "name": "美光 Micron",
+          "url": "https://www.micron.com/about/newsroom"
+        },
+        {
+          "name": "西部数据 Western Digital",
+          "url": "https://blog.westerndigital.com/"
+        },
+        {
+          "name": "铠侠 Kioxia",
+          "url": "https://www.kioxia.com/en-us/"
+        }
+      ]
     },
     {
       "id": "token",
@@ -266,9 +331,101 @@
               "vendor": "",
               "region": ""
             }
+          ],
+          "channels": [
+            {
+              "name": "OpenAI 官方（GPT）",
+              "url": "https://openai.com/news"
+            },
+            {
+              "name": "Anthropic 官方（Claude）",
+              "url": "https://www.anthropic.com/news"
+            },
+            {
+              "name": "Google 官方博客（Gemini）",
+              "url": "https://blog.google/technology/ai/"
+            },
+            {
+              "name": "微软 Azure 官方博客",
+              "url": "https://azure.microsoft.com/en-us/blog/"
+            },
+            {
+              "name": "Meta AI 官方博客",
+              "url": "https://ai.meta.com/blog/"
+            },
+            {
+              "name": "Mistral AI 官方",
+              "url": "https://mistral.ai/news"
+            },
+            {
+              "name": "xAI 官方（Grok）",
+              "url": "https://x.ai/blog"
+            },
+            {
+              "name": "Cohere 官方",
+              "url": "https://cohere.com/blog"
+            },
+            {
+              "name": "百度智能云千帆（文心）",
+              "url": "https://cloud.baidu.com/product/wenxinworkshop"
+            },
+            {
+              "name": "阿里云百炼（通义）",
+              "url": "https://bailian.aliyun.com/"
+            },
+            {
+              "name": "智谱 AI（GLM）",
+              "url": "https://open.bigmodel.cn/"
+            }
           ]
         }
-      }
+      },
+      "channels": [
+        {
+          "name": "OpenAI 官方（GPT）",
+          "url": "https://openai.com/news"
+        },
+        {
+          "name": "Anthropic 官方（Claude）",
+          "url": "https://www.anthropic.com/news"
+        },
+        {
+          "name": "Google 官方博客（Gemini）",
+          "url": "https://blog.google/technology/ai/"
+        },
+        {
+          "name": "微软 Azure 官方博客",
+          "url": "https://azure.microsoft.com/en-us/blog/"
+        },
+        {
+          "name": "Meta AI 官方博客",
+          "url": "https://ai.meta.com/blog/"
+        },
+        {
+          "name": "Mistral AI 官方",
+          "url": "https://mistral.ai/news"
+        },
+        {
+          "name": "xAI 官方（Grok）",
+          "url": "https://x.ai/blog"
+        },
+        {
+          "name": "Cohere 官方",
+          "url": "https://cohere.com/blog"
+        },
+        {
+          "name": "百度智能云千帆（文心）",
+          "url": "https://cloud.baidu.com/product/wenxinworkshop"
+        },
+        {
+          "name": "阿里云百炼（通义）",
+          "url": "https://bailian.aliyun.com/"
+        },
+        {
+          "name": "智谱 AI（GLM）",
+          "url": "https://open.bigmodel.cn/"
+        }
+      ]
     },
     {
       "id": "compute",
@@ -277,20 +434,164 @@
       "dates": {
         "2026-10-19": {
           "summary": "今日（2026-10-19）未检索到算力市场的官方更新，可点击各厂商官方渠道持续关注。",
-          "items": []
+          "items": [],
+          "channels": [
+            {
+              "name": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/"
+            },
+            {
+              "name": "AMD 官方",
+              "url": "https://www.amd.com/en/newsroom.html"
+            },
+            {
+              "name": "Intel 英特尔",
+              "url": "https://newsroom.intel.com/"
+            },
+            {
+              "name": "华为昇腾",
+              "url": "https://www.hiascend.com/"
+            },
+            {
+              "name": "寒武纪",
+              "url": "https://www.cambricon.com/"
+            },
+            {
+              "name": "摩尔线程",
+              "url": "https://www.mthreads.com/"
+            },
+            {
+              "name": "沐曦股份",
+              "url": "https://www.metax-tech.com/"
+            },
+            {
+              "name": "壁仞科技",
+              "url": "https://www.birentech.com/"
+            },
+            {
+              "name": "天数智芯",
+              "url": "https://www.iluvatar.com/"
+            },
+            {
+              "name": "燧原科技",
+              "url": "https://www.enflame-tech.com/"
+            },
+            {
+              "name": "昆仑芯",
+              "url": "https://www.kunlunxin.com/"
+            }
+          ]
         }
-      }
+      },
+      "channels": [
+        {
+          "name": "NVIDIA 英伟达",
+          "url": "https://nvidianews.nvidia.com/"
+        },
+        {
+          "name": "AMD 官方",
+          "url": "https://www.amd.com/en/newsroom.html"
+        },
+        {
+          "name": "Intel 英特尔",
+          "url": "https://newsroom.intel.com/"
+        },
+        {
+          "name": "华为昇腾",
+          "url": "https://www.hiascend.com/"
+        },
+        {
+          "name": "寒武纪",
+          "url": "https://www.cambricon.com/"
+        },
+        {
+          "name": "摩尔线程",
+          "url": "https://www.mthreads.com/"
+        },
+        {
+          "name": "沐曦股份",
+          "url": "https://www.metax-tech.com/"
+        },
+        {
+          "name": "壁仞科技",
+          "url": "https://www.birentech.com/"
+        },
+        {
+          "name": "天数智芯",
+          "url": "https://www.iluvatar.com/"
+        },
+        {
+          "name": "燧原科技",
+          "url": "https://www.enflame-tech.com/"
+        },
+        {
+          "name": "昆仑芯",
+          "url": "https://www.kunlunxin.com/"
+        }
+      ]
     },
     {
       "id": "jd",
-      "name": "京东政企市场",
+      "name": "京东政企",
       "accent": "#dc2626",
       "dates": {
         "2026-10-19": {
           "summary": "今日（2026-10-19）未检索到「京东政企市场」的官方更新，可点击下方官方渠道持续关注。",
-          "items": []
+          "items": [],
+          "channels": [
+            {
+              "name": "京东企业业务",
+              "url": "https://e.jd.com/"
+            },
+            {
+              "name": "京东云",
+              "url": "https://www.jdcloud.com/"
+            },
+            {
+              "name": "京东",
+              "url": "https://www.jd.com/"
+            },
+            {
+              "name": "京东黑板报（官方资讯）",
+              "url": "https://news.jd.com/"
+            },
+            {
+              "name": "京东物流",
+              "url": "https://www.jdl.com/"
+            },
+            {
+              "name": "京东工业",
+              "url": "https://www.jd.com/"
+            }
+          ]
         }
-      }
+      },
+      "channels": [
+        {
+          "name": "京东企业业务",
+          "url": "https://e.jd.com/"
+        },
+        {
+          "name": "京东云",
+          "url": "https://www.jdcloud.com/"
+        },
+        {
+          "name": "京东",
+          "url": "https://www.jd.com/"
+        },
+        {
+          "name": "京东黑板报（官方资讯）",
+          "url": "https://news.jd.com/"
+        },
+        {
+          "name": "京东物流",
+          "url": "https://www.jdl.com/"
+        },
+        {
+          "name": "京东工业",
+          "url": "https://www.jd.com/"
+        }
+      ]
     },
     {
       "id": "review",
@@ -414,6 +715,12 @@
         }
       }
 
+      // 无更新（或当日无条目）时，展示官方关注渠道，便于用户自行跟进
+      const hasItems = entry && (entry.items||[]).length > 0;
+      if(!hasItems){
+        body += channelsHtml(sec.channels);
+      }
+
       card.innerHTML =
         '<div class="card-head"><span class="dot"></span><h2>'+escapeHtml(sec.name)+'</h2>'+
         '<span class="tag">每日动态</span></div>'+
@@ -444,6 +751,13 @@
   function groupHtml(title, items){
     if(!items.length) return '';
     return '<div class="group-title">'+escapeHtml(title)+'</div>'+itemsHtml(items);
+  }
+
+  function channelsHtml(channels){
+    if(!channels || !channels.length) return '';
+    return '<div class="channels"><span class="ch-lbl">官方关注渠道（点击进入官网自行跟进）：</span>' +
+      channels.map(c => '<a class="ch-link" href="'+escapeAttr(c.url)+'" target="_blank" rel="noopener">'+escapeHtml(c.name)+' ↗</a>').join('') +
+      '</div>';
   }
 
   // 周/月总结模块
