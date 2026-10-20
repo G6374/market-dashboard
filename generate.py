@@ -61,11 +61,14 @@ FOCUS = {
                  "合作中标、行业落地动态。",
 }
 
-# ---- 数据源（权威官方 / 官网 Newsroom；严格只取发布日==目标日当天的内容）----
+# ---- 数据源：权威官方 Newsroom + 权威行业媒体（机器之心/量子位/36氪/钛媒体/DIGITIMES 等
+#      均为"可抓取的同源权威内容"；严格只取发布日==目标日当天的内容。
+#      说明：微信公众号需登录态+强反爬，云端自动化无法直接抓取，故用其同源官网/RSS 替代。----
 SOURCES = {
     "storage": [
         {"type": "rss", "url": "https://www.trendforce.com/news/feed/", "source": "TrendForce 集邦咨询"},
         {"type": "rss", "url": "https://news.skhynix.com/feed/", "source": "SK 海力士"},
+        {"type": "rss", "url": "https://www.digitimes.com/rss/daily.xml", "source": "DIGITIMES 电子时报（半导体媒体）"},
     ],
     "token": [
         {"type": "rss", "url": "https://openai.com/news/rss.xml", "source": "OpenAI 官方（GPT）"},
@@ -79,11 +82,21 @@ SOURCES = {
         {"type": "html", "url": "https://cloud.baidu.com/product/wenxinworkshop", "source": "百度智能云千帆（文心）"},
         {"type": "html", "url": "https://bailian.aliyun.com/", "source": "阿里云百炼（通义）"},
         {"type": "html", "url": "https://open.bigmodel.cn/", "source": "智谱 AI（GLM）"},
+        # 权威行业媒体（可抓取、同日过滤；对应公众号同源）
+        {"type": "rss", "url": "https://www.qbitai.com/feed", "source": "量子位（AI 媒体）"},
+        {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）"},
+        {"type": "rss", "url": "https://www.tmtpost.com/rss.xml", "source": "钛媒体（科技媒体）"},
+        {"type": "rss", "url": "https://techcrunch.com/category/artificial-intelligence/feed/", "source": "TechCrunch AI"},
+        {"type": "rss", "url": "https://the-decoder.com/feed/", "source": "The Decoder（AI 媒体）"},
+        {"type": "rss", "url": "https://www.marktechpost.com/feed/", "source": "Marktechpost（AI 媒体）"},
     ],
     "compute_foreign": [
         {"type": "rss", "url": "https://nvidianews.nvidia.com/news/rss", "source": "NVIDIA 英伟达", "vendor": "英伟达 NVIDIA", "region": "foreign"},
         {"type": "html", "url": "https://www.amd.com/en/newsroom.html", "source": "AMD 官方", "vendor": "AMD", "region": "foreign"},
         {"type": "rss", "url": "https://newsroom.intel.com/feed/", "source": "Intel 英特尔", "vendor": "Intel 英特尔", "region": "foreign"},
+        # 权威硬件/半导体媒体（尽力而为；超时不影响主流程）
+        {"type": "rss", "url": "https://www.servethehome.com/feed/", "source": "ServeTheHome（硬件媒体）", "region": "foreign"},
+        {"type": "rss", "url": "https://www.tomshardware.com/feeds/all", "source": "Tom's Hardware（硬件媒体）", "region": "foreign"},
     ],
     "compute_domestic": [
         {"type": "html", "url": "https://www.hiascend.com/", "source": "华为昇腾", "vendor": "华为昇腾", "region": "domestic"},
@@ -94,6 +107,8 @@ SOURCES = {
         {"type": "html", "url": "https://www.iluvatar.com/", "source": "天数智芯", "vendor": "天数智芯", "region": "domestic"},
         {"type": "html", "url": "https://www.enflame-tech.com/", "source": "燧原科技", "vendor": "燧原科技", "region": "domestic"},
         {"type": "html", "url": "https://www.kunlunxin.com/", "source": "昆仑芯", "vendor": "昆仑芯", "region": "domestic"},
+        # 权威半导体媒体（尽力而为；超时不影响主流程）
+        {"type": "rss", "url": "https://www.jiwei.com.cn/rss", "source": "集微网（半导体媒体）", "region": "domestic"},
     ],
     "jd": [
         {"type": "html", "url": "https://e.jd.com/", "source": "京东企业业务"},
@@ -101,6 +116,9 @@ SOURCES = {
         {"type": "html", "url": "https://www.jd.com/", "source": "京东"},
         {"type": "html", "url": "https://news.jd.com/", "source": "京东黑板报（官方资讯）"},
         {"type": "html", "url": "https://www.jdl.com/", "source": "京东物流"},
+        # 权威科技/企业媒体（可抓取、同日过滤；对应公众号同源）
+        {"type": "rss", "url": "https://www.tmtpost.com/rss.xml", "source": "钛媒体（科技媒体）"},
+        {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）"},
     ],
 }
 
