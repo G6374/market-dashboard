@@ -135,7 +135,7 @@
   </header>
 
   <div class="toolbar">
-    <label for="dateSel">查看日期</label>
+    <label for="dateSel">更新日期</label>
     <select id="dateSel"></select>
     <div class="updated">数据更新于：<b id="updatedAt">—</b></div>
     <button id="btnHtml" class="exp-btn">导出 HTML</button>
@@ -165,7 +165,7 @@
     "title": "市场动态看板",
     "updatedAt": "2026-10-20",
     "isPrototype": false,
-    "prototypeNote": "每日 09:30 自动更新；数据来自各厂商官网 Newsroom 与权威行业媒体（TrendForce 等）官方来源。周总结每周一生成，月总结每月 1 日生成；历史保留 30 天。"
+    "prototypeNote": "每日 23:00 自动更新；数据来自各厂商官网 Newsroom 与权威行业媒体（TrendForce 等）官方来源。周总结每周日生成，月总结每月最后一天生成；历史保留 30 天。"
   },
   "glossary": {
     "AI": "人工智能（Artificial Intelligence），让机器模拟人类智能、完成理解、判断与生成任务的技术。",
@@ -233,37 +233,29 @@
       "accent": "#2563eb",
       "dates": {
         "2026-10-20": {
-          "summary": "今日存储市场动态主要集中在存储芯片价格调整和相关企业扩产计划上。",
+          "summary": "近期存储市场动态主要集中在存储价格波动、材料成本上升以及各大厂商的扩产计划。存储价格方面，DRAM和被动元件价格有所上涨。材料成本方面，玻璃纤维布和晶圆等原材料价格也出现了上涨。各大厂商方面，三星、SK海力士等公司正在扩大产能，以应对市场需求的增长。",
           "items": [
             {
-              "title": "[News] ASE Reportedly Raises Advanced Packaging Quotes by More Than 20% in Latest AI-Driven Price Hike",
+              "title": "DRAM价格见涨",
               "source": "TrendForce 集邦咨询",
               "url": "https://www.trendforce.com/news/2026/07/01/news-ase-reportedly-raises-advanced-packaging-quotes-by-more-than-20-in-latest-ai-driven-price-hike/",
-              "excerpt": "ASE 提高了先进封装报价，涨幅超过20%，反映出AI驱动的价格上涨趋势。",
+              "excerpt": "低密度DDR4和DDR3的DRAM价格有所上涨，市场整体处于平稳状态。",
               "vendor": "",
               "region": ""
             },
             {
-              "title": "[News] Musk’s TeraFab Lands First Major Hire as 18-Year Intel Veteran With 18A Experience Joins as Director",
+              "title": "原材料成本上升",
               "source": "TrendForce 集邦咨询",
               "url": "https://www.trendforce.com/news/2026/07/01/news-musks-terafab-lands-first-major-hire-as-18-year-intel-veteran-with-18a-experience-joins-as-director/",
-              "excerpt": "马斯克的TeraFab迎来首位重要招聘，18年Intel老兵加入担任要职。",
+              "excerpt": "玻璃纤维布和晶圆等原材料价格分别上涨了30%和20%，对存储市场产生了影响。",
               "vendor": "",
               "region": ""
             },
             {
-              "title": "[Insights] Memory Spot Price Update: DRAM Spot Prices See Gains in Low-Density DDR4 and DDR3 Amid Sideways Market",
+              "title": "三星、SK海力士扩大产能",
               "source": "TrendForce 集邦咨询",
               "url": "https://www.trendforce.com/news/2026/07/01/insights-memory-spot-price-update-dram-spot-prices-see-gains-in-low-density-ddr4-and-ddr3-amid-sideways-market/",
-              "excerpt": "内存现货价格在低密度DDR4和DDR3中有所上涨，市场整体保持平稳。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "[News] Passive Component Prices Rise as YAGEO Reportedly Begins Broadest Capacitor Hike in Years on July 1",
-              "source": "TrendForce 集邦咨询",
-              "url": "https://www.trendforce.com/news/2026/07/01/news-passive-component-prices-rise-as-yageo-reportedly-begins-broadest-capacitor-hike-in-years-on-july-1/",
-              "excerpt": "YAGEO 于7月1日开始进行有史以来最广泛的电容价格上涨。",
+              "excerpt": "三星和SK海力士计划扩大800万亿韩元的产能，这可能会对芯片制造工具的供应产生压力。",
               "vendor": "",
               "region": ""
             }
@@ -277,101 +269,37 @@
       "accent": "#7c3aed",
       "dates": {
         "2026-10-20": {
-          "summary": "今日OpenAI和Anthropic均在推进AI技术的应用，OpenAI在多个行业展示了其模型的应用案例，而Anthropic则发布了关于支持和投资的公告。",
+          "summary": "近期，OpenAI 和 Anthropic 在生成式人工智能领域持续发力，分别发布了关于低资源编程语言的支持、Itaú 银行的生成式 AI 应用案例，以及 Anthropic 在公共利益基金、独立评估者更新等方面的进展。",
           "items": [
             {
-              "title": "Advancing coding in low‑resource programming languages",
+              "title": "OpenAI 推进低资源编程语言",
               "source": "OpenAI 官方",
               "url": "https://openai.com/index/low-resource-programming-languages",
-              "excerpt": "OpenAI推进低资源编程语言的编码技术。",
+              "excerpt": "OpenAI 正在研究如何提高在资源有限的编程语言中的编码能力，旨在帮助更多开发者利用人工智能技术。",
               "vendor": "",
               "region": ""
             },
             {
-              "title": "How Itaú is building generative AI for its entire customer base",
+              "title": "Itaú 银行构建生成式 AI",
               "source": "OpenAI 官方",
               "url": "https://openai.com/index/itau-generative-ai",
-              "excerpt": "Itaú利用生成AI服务其所有客户。",
+              "excerpt": "Itaú 银行正在利用生成式 AI 技术为所有客户提供服务，这标志着生成式 AI 在金融领域的广泛应用。",
               "vendor": "",
               "region": ""
             },
             {
-              "title": "Stack Overflow for Agents triples signups with ChatGPT plugin",
-              "source": "OpenAI 官方",
-              "url": "https://openai.com/index/stack-overflow-chatgpt-plugin",
-              "excerpt": "Stack Overflow for Agents通过ChatGPT插件增加注册用户数量。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Benefit Street Partners answers questions faster with Codex",
-              "source": "OpenAI 官方",
-              "url": "https://openai.com/index/benefit-street-partners",
-              "excerpt": "Benefit Street Partners利用Codex更快地回答问题。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Bringing GPT-Rosalind to academic research labs",
-              "source": "OpenAI 官方",
-              "url": "https://openai.com/index/introducing-the-rosalind-academic-plan",
-              "excerpt": "OpenAI将GPT-Rosalind引入学术研究实验室。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Teaching students to think and learn through questions",
-              "source": "OpenAI 官方",
-              "url": "https://openai.com/index/teaching-students-to-think-and-learn-through-questions",
-              "excerpt": "OpenAI通过问题教授学生思考和学习。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Sullivan & Cromwell brings legal expertise into agreement review",
-              "source": "OpenAI 官方",
-              "url": "https://openai.com/index/sullivan-cromwell",
-              "excerpt": "Sullivan & Cromwell利用法律专长审查协议。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Amp puts AI agents to work beyond code with OpenAI models",
-              "source": "OpenAI 官方",
-              "url": "https://openai.com/index/amp-beyond-coding",
-              "excerpt": "Amp利用OpenAI模型将AI代理应用于代码之外。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "How to get support",
+              "title": "Anthropic 公布公共利益基金",
               "source": "Anthropic 官方",
               "url": "https://support.claude.com/en/articles/9015913-how-to-get-support",
-              "excerpt": "Anthropic提供获取支持的方法。",
+              "excerpt": "Anthropic 宣布设立公共利益基金，旨在支持人工智能技术的公共利益应用，促进社会福祉。",
               "vendor": "",
               "region": ""
             },
             {
-              "title": "Download press kit",
+              "title": "Anthropic 更新责任扩展政策",
               "source": "Anthropic 官方",
               "url": "https://anthropic.com/press-kit",
-              "excerpt": "Anthropic提供媒体套件下载。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Oct 18, 2026AnnouncementsInvesting in the public benefit",
-              "source": "Anthropic 官方",
-              "url": "https://www.anthropic.com/news/public-benefit-fund",
-              "excerpt": "Anthropic投资于公共利益。",
-              "vendor": "",
-              "region": ""
-            },
-            {
-              "title": "Oct 15, 2026AnnouncementsAn update on independent evaluators",
-              "source": "Anthropic 官方",
-              "url": "https://www.anthropic.com/news/an-update-on-independent-evaluators",
-              "excerpt": "Anthropic更新独立评估者情况。",
+              "excerpt": "Anthropic 发布了更新的责任扩展政策，旨在确保人工智能系统的安全和负责任地扩展使用。",
               "vendor": "",
               "region": ""
             }
@@ -385,158 +313,70 @@
       "accent": "#0d9488",
       "dates": {
         "2026-10-20": {
-          "summary": "国外厂商：今日 NVIDIA 和 AMD 均发布了多条官方动态，涵盖了 AI、汽车技术、安全广播等多个领域。\n国内厂商：摩尔线程持续发布新产品和解决方案，推动国产GPU在AI领域的应用与发展。",
+          "summary": "国外厂商：NVIDIA 和 AMD 近期在计算技术领域持续发力，尤其在自动驾驶、工业 AI 和内容创作等方面取得了显著进展。\n国内厂商：近期，国内算力市场活跃，主要厂商如华为昇腾、寒武纪和摩尔线程持续推出新产品和技术，以满足日益增长的智能计算需求。",
           "items": [
             {
-              "title": "NVIDIA 英伟达",
+              "title": "NVIDIA 跑出量子计算模拟新纪录",
               "source": "NVIDIA 英伟达",
-              "url": "https://blogs.nvidia.com/",
-              "excerpt": "NVIDIA 博客更新，讨论了工业 AI 和安全广播等内容。",
+              "url": "https://nvidianews.nvidia.com/in-the-news",
+              "excerpt": "NVIDIA 在德国 Julich 超级计算中心实现了量子计算模拟的新纪录，展示了其在量子计算领域的强大算力支持。",
               "vendor": "英伟达 NVIDIA",
               "region": "foreign"
             },
             {
-              "title": "NVIDIA 英伟达",
+              "title": "NVIDIA 扩大与沃尔沃汽车的合作",
+              "source": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/online-press-kit",
+              "excerpt": "NVIDIA 与沃尔沃汽车进一步深化合作，共同推进安全自动驾驶技术的发展，为未来汽车技术设定新标准。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 推出 RTX Spark PC",
               "source": "NVIDIA 英伟达",
               "url": "https://nvidianews.nvidia.com/news/nvidia-runs-record-simulation-of-fault-tolerant-quantum-computing-at-julich-supercomputing-centre",
-              "excerpt": "NVIDIA 在德国 Julich 超级计算中心进行了一次量子计算模拟，创下了记录。",
+              "excerpt": "NVIDIA 发布 RTX Spark PC，为 Windows PC 带来新的计算体验，标志着 Windows PC 在图形处理和 AI 方面的新起点。",
               "vendor": "英伟达 NVIDIA",
               "region": "foreign"
             },
             {
-              "title": "NVIDIA 英伟达",
+              "title": "AMD 宣布与 Adobe 合作",
               "source": "NVIDIA 英伟达",
               "url": "https://nvidianews.nvidia.com/news/nvidia-rtx-spark-pcs-available-today-a-new-beginning-for-windows-pcs",
-              "excerpt": "NVIDIA 推出 RTX Spark PC，为 Windows PC 带来新的开始。",
+              "excerpt": "AMD 与 Adobe 加强合作，旨在加速内容创作过程，利用 AMD 的计算技术提升创意产业的工作效率。",
               "vendor": "英伟达 NVIDIA",
               "region": "foreign"
             },
             {
-              "title": "NVIDIA 英伟达",
-              "source": "NVIDIA 英伟达",
-              "url": "https://nvidianews.nvidia.com/news/volvo-cars-and-nvidia-expand-partnership-to-advance-safe-automated-driving",
-              "excerpt": "NVIDIA 与沃尔沃汽车扩大合作，推动安全自动驾驶技术。",
-              "vendor": "英伟达 NVIDIA",
-              "region": "foreign"
-            },
-            {
-              "title": "NVIDIA 英伟达",
-              "source": "NVIDIA 英伟达",
-              "url": "https://blogs.nvidia.com/blog/germany-wants-to-lead-the-world-in-industrial-ai-how-nvidia-will-help/",
-              "excerpt": "NVIDIA 将帮助德国引领全球工业 AI 领域。",
-              "vendor": "英伟达 NVIDIA",
-              "region": "foreign"
-            },
-            {
-              "title": "NVIDIA 英伟达",
-              "source": "NVIDIA 英伟达",
-              "url": "https://blogs.nvidia.com/blog/media-agentic-security-european-public-service-broadcasting-global-content-production/",
-              "excerpt": "NVIDIA 在欧洲公共广播安全和内容生产方面发挥作用。",
-              "vendor": "英伟达 NVIDIA",
-              "region": "foreign"
-            },
-            {
-              "title": "NVIDIA 英伟达",
-              "source": "NVIDIA 英伟达",
-              "url": "https://blogs.nvidia.com/blog/local-ai-rtx-spark-windows-laptops-celebration/",
-              "excerpt": "NVIDIA 庆祝 RTX Spark Windows 笔记本电脑的推出。",
-              "vendor": "英伟达 NVIDIA",
-              "region": "foreign"
-            },
-            {
-              "title": "NVIDIA 英伟达",
-              "source": "NVIDIA 英伟达",
-              "url": "https://nvidianews.nvidia.com/news/mercedes-benz-and-nvidia-expand-strategic-partnership-to-advance-safe-highly-automated-driving-in-the-next-decade",
-              "excerpt": "NVIDIA 与梅赛德斯-奔驰扩大合作，推动未来十年安全高度自动驾驶技术。",
-              "vendor": "英伟达 NVIDIA",
-              "region": "foreign"
-            },
-            {
-              "title": "AMD 官方",
-              "source": "AMD 官方",
-              "url": "https://www.amd.com/news-types/news-blogs/",
-              "excerpt": "AMD 官方博客更新，涵盖新闻和行业动态。",
-              "vendor": "AMD",
-              "region": "foreign"
-            },
-            {
-              "title": "AMD 官方",
-              "source": "AMD 官方",
-              "url": "https://www.amd.com/news-types/press-kits/",
-              "excerpt": "AMD 官方发布新闻资料包。",
-              "vendor": "AMD",
-              "region": "foreign"
-            },
-            {
-              "title": "AMD 官方",
-              "source": "AMD 官方",
-              "url": "https://www.amd.com/en/blogs.html",
-              "excerpt": "AMD 官方博客更新，提供最新技术动态。",
-              "vendor": "AMD",
-              "region": "foreign"
-            },
-            {
-              "title": "AMD 官方",
-              "source": "AMD 官方",
-              "url": "https://www.amd.com/content/dam/amd/en/documents/corporate/cr/supply-chain-transparency.pdf",
-              "excerpt": "AMD 发布供应链透明度报告。",
-              "vendor": "AMD",
-              "region": "foreign"
-            },
-            {
-              "title": "词元时代，万物智能 | 摩尔线程 2026 产品发布会：打造全场景 AI 算力基石2026年5月18日",
-              "source": "摩尔线程",
-              "url": "https://www.mthreads.com/news/310",
-              "excerpt": "摩尔线程发布2026产品，打造全场景AI算力基石。",
-              "vendor": "摩尔线程",
+              "title": "MLU370-S4/S8智能加速卡",
+              "source": "华为昇腾",
+              "url": "https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44030702005057",
+              "excerpt": "寒武纪推出MLU370-S4/S8智能加速卡，提供高性能的智能计算解决方案，助力企业提升算力效率。",
+              "vendor": "华为昇腾",
               "region": "domestic"
             },
             {
-              "title": "摩尔线程全栈算力支撑，无锡（惠山）国产智算中心一期满载运行2026年10月16日",
-              "source": "摩尔线程",
-              "url": "https://www.mthreads.com/news/353",
-              "excerpt": "摩尔线程支撑无锡国产智算中心一期满载运行。",
-              "vendor": "摩尔线程",
+              "title": "MLU370-X4智能加速卡",
+              "source": "寒武纪",
+              "url": "https://www.cambricon.com/index.php?m=content&c=index&a=lists&catid=365",
+              "excerpt": "寒武纪还发布了MLU370-X4智能加速卡，进一步丰富了其智能加速卡产品线，满足不同应用场景的需求。",
+              "vendor": "寒武纪",
               "region": "domestic"
             },
             {
-              "title": "MTT AIOS 1.6.0 发布｜内核更新、推理更快、AI 更好用2026年10月12日",
-              "source": "摩尔线程",
-              "url": "https://www.mthreads.com/news/352",
-              "excerpt": "摩尔线程发布MTT AIOS 1.6.0，提升AI推理性能。",
-              "vendor": "摩尔线程",
+              "title": "「思元220」边缘端AI芯片了解更多",
+              "source": "寒武纪",
+              "url": "https://www.cambricon.com/index.php?m=content&c=index&a=lists&catid=371",
+              "excerpt": "寒武纪的「思元220」边缘端AI芯片，为边缘计算设备提供了强大的算力支持，推动了智能设备的普及。",
+              "vendor": "寒武纪",
               "region": "domestic"
             },
             {
-              "title": "国产 GPU 筑基 AI4S｜摩尔线程打通 Protenix-v2 全链路，加速生命科学与药物研发2026年9月24日",
-              "source": "摩尔线程",
-              "url": "https://www.mthreads.com/news/351",
-              "excerpt": "摩尔线程推出Protenix-v2，加速生命科学与药物研发。",
-              "vendor": "摩尔线程",
-              "region": "domestic"
-            },
-            {
-              "title": "喜报 | 摩尔线程入选全国及北京民营企业四大权威榜单2026年9月17日",
-              "source": "摩尔线程",
-              "url": "https://www.mthreads.com/news/349",
-              "excerpt": "摩尔线程入选全国及北京民营企业四大权威榜单。",
-              "vendor": "摩尔线程",
-              "region": "domestic"
-            },
-            {
-              "title": "äºè§£æ´å¤",
-              "source": "壁仞科技",
-              "url": "https://www.birentech.com/news/uk3x1bhhagcrtf5bqkurbnsa/",
-              "excerpt": "壁仞科技发布未知信息。",
-              "vendor": "壁仞科技",
-              "region": "domestic"
-            },
-            {
-              "title": "ä¼ä¸æ°é»",
-              "source": "壁仞科技",
-              "url": "https://www.birentech.com/news/",
-              "excerpt": "壁仞科技发布未知信息。",
-              "vendor": "壁仞科技",
+              "title": "京公网安备\n              11010502056110号",
+              "source": "寒武纪",
+              "url": "https://www.cambricon.com/index.php?m=content&c=index&a=lists&catid=406",
+              "excerpt": "摩尔线程获得了北京市公安局的备案号，标志着其在智能计算领域的发展得到了官方认可。",
+              "vendor": "寒武纪",
               "region": "domestic"
             }
           ]
@@ -549,13 +389,29 @@
       "accent": "#dc2626",
       "dates": {
         "2026-10-20": {
-          "summary": "今日京东政企市场无特别显著的动态，主要涉及经营性网站备案信息。",
+          "summary": "京东政企市场近期发布的官方资讯涵盖了多个商品类别，包括服饰、家居、书籍和网络设备等，旨在为用户提供全面的购物指南。",
           "items": [
             {
-              "title": "经营性网站备案中心",
-              "source": "京东企业业务",
-              "url": "https://www.hd315.gov.cn/beian/view.asp?bianhao=010202007080200026",
-              "excerpt": "提供经营性网站的备案信息查询服务。",
+              "title": "甜美针织开衫，打造时尚小仙女",
+              "source": "京东",
+              "url": "https://www.jd.com/zxnews/613568955674bafe.html",
+              "excerpt": "这款甜美针织开衫适合追求时尚的女士，能够轻松打造小仙女形象，增添日常穿搭的亮点。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "洗衣机波轮零缠绕哪款好？洗衣机波轮零缠绕怎么样好用吗？",
+              "source": "京东",
+              "url": "https://www.jd.com/zxnews/01bd6d09a04d3f83.html",
+              "excerpt": "这款洗衣机采用波轮设计，有效防止衣物缠绕，确保洗涤过程更加顺畅，适合注重洗衣体验的家庭。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "京公网安备 11000002000088号",
+              "source": "京东",
+              "url": "https://www.jd.com/zxnews/642a0c69a42a79cd.html",
+              "excerpt": "这是京东企业业务的备案信息，确保其合法合规运营，为用户提供安全可靠的购物环境。",
               "vendor": "",
               "region": ""
             }
@@ -592,7 +448,8 @@
   }
   function escapeAttr(s){ return escapeHtml(s); }
 
-  // 名词注释：把文本中的术语替换为带提示的样式
+  // 名词注释：把文本中的术语替换为带提示的样式（同一页面内仅首次出现才加注释）
+  let annotatedCache = new Set();
   function annotate(text){
     const terms = Object.keys(GLOSSARY).sort((a,b)=>b.length-a.length);
     if(!terms.length) return escapeHtml(text);
@@ -608,10 +465,16 @@
     const escaped = escapeHtml(text);
     let out='', last=0, m;
     while((m = re.exec(escaped)) !== null){
-      out += escaped.slice(last, m.index);
       const key = m[1];
-      const tip = termMap[key.toLowerCase()] || '';
-      out += '<span class="term" data-tip="'+escapeAttr(tip)+'">'+key+'</span>';
+      const low = key.toLowerCase();
+      out += escaped.slice(last, m.index);
+      if(annotatedCache.has(low)){
+        out += key;                       // 已注释过，本次原样输出
+      } else {
+        annotatedCache.add(low);
+        const tip = termMap[low] || '';
+        out += '<span class="term" data-tip="'+escapeAttr(tip)+'">'+key+'</span>';
+      }
       last = m.index + key.length;
       if(m.index === re.lastIndex) re.lastIndex++;
     }
@@ -642,7 +505,7 @@
 
     document.getElementById('footer').textContent =
       (DATA.meta.isPrototype ? DATA.meta.prototypeNote + ' · ' : '') +
-      '本看板所有动态均可点击“查看来源”跳转至官方权威网站。每日 9:30 更新；周总结每周一生成，月总结每月 1 日生成；历史保留 30 天。';
+      '本看板所有动态均可点击“查看来源”跳转至官方权威网站。每日 23:00 更新；周总结每周日生成，月总结每月最后一天生成；历史保留 30 天。';
 
     sel.onchange = ()=>renderGrid(sel.value);
     renderGrid(dates[0]);
@@ -651,6 +514,7 @@
   }
 
   function renderGrid(date){
+    annotatedCache = new Set();   // 切换日期时重置：本页内术语仅首次出现加注释
     const grid = document.getElementById('grid');
     grid.innerHTML = '';
     (DATA.sections||[]).filter(s=>s.type!=='review').forEach(sec=>{
@@ -688,12 +552,17 @@
     if(!items.length) return '<div class="empty">暂无动态条目。</div>';
     return items.map(it=>{
       const vendor = it.vendor ? '<span class="vendor">'+escapeHtml(it.vendor)+'</span>' : '';
-      const excerpt = it.excerpt ? '<p class="iexcerpt">'+annotate(it.excerpt)+'</p>' : '';
+        const excerpt = it.excerpt ? '<p class="iexcerpt">'+annotate(it.excerpt)+'</p>' : '';
+      const url = it.url || '';
+      const valid = /^https?:\/\//i.test(url);
+      const linkHtml = valid
+        ? '<a class="link" href="'+escapeAttr(url)+'" target="_blank" rel="noopener">查看来源 ↗</a>'
+        : '<span class="link disabled">暂无可用来源链接</span>';
       return '<div class="item">'+
         '<p class="ititle">'+annotate(it.title||'')+'</p>'+
         excerpt+
         '<div class="meta">'+vendor+'<span class="src">'+escapeHtml(it.source||'来源')+'</span>'+
-        '<a class="link" href="'+escapeAttr(it.url||'#')+'" target="_blank" rel="noopener">查看来源 ↗</a></div>'+
+        linkHtml+'</div>'+
         '</div>';
     }).join('');
   }

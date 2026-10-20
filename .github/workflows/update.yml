@@ -1,7 +1,7 @@
 name: 市场动态看板每日更新
 on:
   schedule:
-    - cron: "30 1 * * *"      # UTC 01:30 = 北京时间 09:30
+    - cron: "0 15 * * *"      # UTC 15:00 = 北京时间 23:00
   workflow_dispatch:          # 支持手动触发测试
 permissions:
   contents: write
@@ -22,6 +22,9 @@ jobs:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_API_URL: ${{ secrets.LLM_API_URL }}
           LLM_MODEL: ${{ secrets.LLM_MODEL }}
+          FALLBACK_API_KEY: ${{ secrets.FALLBACK_API_KEY }}
+          FALLBACK_API_URL: ${{ secrets.FALLBACK_API_URL }}
+          FALLBACK_MODEL: ${{ secrets.FALLBACK_MODEL }}
         run: python generate.py
       - name: 提交更新
         run: |
