@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>市场动态看板</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#ffffff; --ink:#1f2937; --muted:#6b7280;
+    --line:#e5e7eb; --shadow:0 1px 3px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.7; font-size:15px;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 20px 60px;}
+  header.top{display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:6px;}
+  h1{font-size:24px; margin:0; letter-spacing:.5px;}
+  .sub{color:var(--muted); font-size:13px; margin-top:4px;}
+  .proto-badge{
+    display:inline-block; background:#fff7ed; color:#c2410c; border:1px solid #fed7aa;
+    padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600;
+  }
+  .toolbar{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:12px 16px; margin:18px 0 22px; box-shadow:var(--shadow);
+  }
+  .toolbar label{font-size:13px; color:var(--muted);}
+  select{
+    font:inherit; padding:7px 12px; border:1px solid var(--line); border-radius:8px;
+    background:#fff; color:var(--ink); cursor:pointer;
+  }
+  .updated{margin-left:auto; font-size:13px; color:var(--muted);}
+  .updated b{color:var(--ink);}
+  .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px;}
+  @media (max-width:860px){ .grid{grid-template-columns:1fr;} }
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column;
+  }
+  .card-head{
+    display:flex; align-items:center; gap:10px; padding:16px 18px;
+    border-bottom:1px solid var(--line); border-left:4px solid var(--accent,#2563eb);
+  }
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--accent,#2563eb);}
+  .card-head h2{font-size:17px; margin:0; flex:1;}
+  .tag{font-size:11px; color:#9ca3af; border:1px solid var(--line); border-radius:6px; padding:2px 7px;}
+  .card-body{padding:16px 18px 18px;}
+  .summary{
+    background:#f8fafc; border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; font-size:14px; color:#374151; margin-bottom:14px;
+  }
+  .summary .lbl{font-weight:600; color:var(--ink); display:block; margin-bottom:4px; font-size:12px; letter-spacing:.5px;}
+  .group-title{
+    font-size:12px; font-weight:700; color:var(--muted); letter-spacing:1px;
+    margin:14px 0 8px; text-transform:uppercase;
+  }
+  .item{
+    border:1px solid var(--line); border-radius:10px; padding:11px 13px; margin-bottom:10px;
+    transition:border-color .15s, box-shadow .15s; background:#fff;
+  }
+  .item:hover{border-color:var(--accent,#2563eb); box-shadow:0 2px 10px rgba(16,24,40,.07);}
+  .item .ititle{font-size:14px; font-weight:600; color:var(--ink); margin:0 0 4px;}
+  .item .iexcerpt{font-size:13px; color:#4b5563; margin:0 0 8px;}
+  .item .meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .src{
+    font-size:11px; background:#eef2ff; color:#3730a3; border-radius:6px; padding:2px 8px; font-weight:600;
+  }
+  .vendor{font-size:11px; background:#ecfeff; color:#0e7490; border-radius:6px; padding:2px 8px; font-weight:600;}
+  .link{
+    margin-left:auto; font-size:12px; color:#2563eb; text-decoration:none; font-weight:600;
+    display:inline-flex; align-items:center; gap:3px;
+  }
+  .link:hover{text-decoration:underline;}
+  .empty{color:var(--muted); font-size:13px; padding:8px 2px;}
+  /* 周/月总结面板 */
+  .review-wrap{margin-top:22px; background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:18px 20px;}
+  .review-head{display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:14px;}
+  .review-head h2{font-size:17px; margin:0; flex:1;}
+  .review-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:860px){ .review-grid{grid-template-columns:1fr;} }
+  .review-card{border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:#f8fafc;}
+  .rc-head{font-size:15px; font-weight:700; color:var(--ink);}
+  .rc-period{font-size:12px; color:var(--muted); margin:4px 0 8px;}
+  .rc-body{font-size:14px; color:#374151;}
+  /* term annotation */
+  .term{
+    border-bottom:1px dotted #2563eb; cursor:help; position:relative; color:#1e3a8a;
+  }
+  .term:hover::after{
+    content:attr(data-tip); position:absolute; left:0; top:130%; width:270px;
+    background:#111827; color:#fff; padding:9px 11px; border-radius:8px; font-size:12px;
+    line-height:1.6; z-index:60; white-space:normal; box-shadow:0 6px 18px rgba(0,0,0,.25);
+    font-weight:400; letter-spacing:0;
+  }
+  .term:hover::before{
+    content:''; position:absolute; left:12px; top:118%; border:6px solid transparent;
+    border-bottom-color:#111827; z-index:61;
+  }
+  .gloss-btn{
+    position:fixed; right:22px; bottom:22px; background:#111827; color:#fff; border:none;
+    padding:12px 16px; border-radius:999px; font-size:13px; cursor:pointer; box-shadow:var(--shadow);
+  }
+  .gloss-btn:hover{background:#1f2937;}
+  .modal{position:fixed; inset:0; background:rgba(17,24,39,.45); display:none; align-items:center; justify-content:center; padding:20px; z-index:80;}
+  .modal.open{display:flex;}
+  .modal-box{background:#fff; border-radius:14px; max-width:680px; width:100%; max-height:80vh; overflow:auto; padding:22px 24px;}
+  .modal-box h3{margin:0 0 14px; font-size:18px;}
+  .gl-item{border-bottom:1px solid var(--line); padding:10px 0;}
+  .gl-item .gt{font-weight:700; color:#1e3a8a;}
+  .gl-item .gd{color:#4b5563; font-size:13px; margin-top:2px;}
+  .close{float:right; cursor:pointer; color:var(--muted); font-size:20px; line-height:1; border:none; background:none;}
+  footer{margin-top:30px; color:var(--muted); font-size:12px; text-align:center;}
+  .exp-btn{font:inherit; padding:7px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; color:#2563eb; cursor:pointer; font-weight:600; margin-left:8px;}
+  .exp-btn:hover{background:#eff6ff;}
+  @media print{
+    .toolbar,.gloss-btn,.modal{display:none !important;}
+    body{background:#fff;}
+    .card,.review-wrap{box-shadow:none; border-color:#d1d5db;}
+    .wrap{padding:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 id="boardTitle">市场动态看板</h1>
+      <div class="sub">市场每日动态 · 权威官方来源</div>
+    </div>
+    <span class="proto-badge" id="protoBadge">设计原型 · 示例数据</span>
+  </header>
+
+  <div class="toolbar">
+    <label for="dateSel">查看日期</label>
+    <select id="dateSel"></select>
+    <div class="updated">数据更新于：<b id="updatedAt">—</b></div>
+    <button id="btnHtml" class="exp-btn">导出 HTML</button>
+    <button id="btnPdf" class="exp-btn">导出 PDF</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="review-wrap" id="reviewPanel"></div>
+
+  <footer id="footer"></footer>
+</div>
+
+<button class="gloss-btn" id="glossBtn">术语表 / 名词解释</button>
+
+<div class="modal" id="glossModal">
+  <div class="modal-box">
+    <button class="close" id="glossClose">&times;</button>
+    <h3>术语表（点击看板中带下划线的词也可查看）</h3>
+    <div id="glossList"></div>
+  </div>
+</div>
+
+<!--MARKET-DATA-START-->
+<script type="application/json" id="market-data">{
+  "meta": {
+    "title": "市场动态看板",
+    "updatedAt": "2026-10-20",
+    "isPrototype": false,
+    "prototypeNote": "每日 09:30 自动更新；数据来自各厂商官网 Newsroom 与权威行业媒体（TrendForce 等）官方来源。周总结每周一生成，月总结每月 1 日生成；历史保留 30 天。"
+  },
+  "glossary": {
+    "AI": "人工智能（Artificial Intelligence），让机器模拟人类智能、完成理解、判断与生成任务的技术。",
+    "SSD": "固态硬盘，用闪存芯片存储数据的硬盘，相较机械硬盘速度更快、更抗震。",
+    "NAND": "一种闪存芯片技术，断电后数据不丢失，广泛用于手机、固态硬盘与存储卡。",
+    "DRAM": "动态随机存取存储器，即设备中的“运行内存”，断电后数据丢失。",
+    "HBM": "高带宽存储器，一种堆叠在芯片旁的高速内存，常用于AI显卡以加速大模型计算。",
+    "3D NAND": "把存储单元垂直堆叠起来的闪存技术，可在同样面积内做出更大容量、更低成本。",
+    "企业级存储": "面向公司、机构的大容量、高可靠存储设备或系统，强调稳定与数据安全。",
+    "全闪阵列": "全部由固态硬盘（SSD）组成的企业级存储设备，性能高、延迟低。",
+    "分布式存储": "把数据分散存放在多台机器上、由软件协同管理的存储方式，便于扩展。",
+    "IOPS": "每秒读写次数，衡量存储设备速度的一项指标，数值越大通常越快。",
+    "机械硬盘(HDD)": "用磁碟旋转存储数据的传统硬盘，容量大、价格低，但速度较慢。",
+    "Token": "大模型处理文字的最小单位，可理解为“字或词的一个片段”；调用大模型通常按 Token 数量计费。",
+    "大模型": "参数规模很大的AI模型，能够理解和生成文字、图片、声音等内容。",
+    "推理": "让已经训练好的AI模型根据输入产出结果（如回答问题）的过程。",
+    "训练": "用大量数据让AI模型学习规律、形成能力的过程。",
+    "API": "应用程序接口，这里指调用大模型等能力的标准通道，开发者借此把AI接入自己的系统。",
+    "上下文窗口": "模型一次能“看到”的最大文字长度，越长越能处理长文档与多轮对话。",
+    "多模态": "模型能同时处理文字、图片、声音等多种信息的能力。",
+    "算力租赁": "按需租用 GPU 等计算资源来运行AI任务，按量付费、无需自购硬件。",
+    "参数": "模型内部的可调整数值，数量越大通常代表模型容量越强。",
+    "GPU": "图形处理器，擅长并行计算，是当前AI训练与推理的核心硬件。",
+    "NPU": "神经网络处理器，专为AI计算设计的芯片，常用于端侧与推理场景。",
+    "CUDA": "英伟达（NVIDIA）推出的并行计算软件平台，是AI开发领域的主流工具。",
+    "昇腾(Ascend)": "华为推出的AI处理器系列，用于训练与推理等AI任务。",
+    "华为昇腾": "华为推出的AI处理器系列（见“昇腾 Ascend”），是当前国产算力的代表之一。",
+    "寒武纪": "国产AI芯片公司，产品覆盖云端训练与推理芯片。",
+    "摩尔线程": "国产GPU公司，产品覆盖图形渲染与AI加速。",
+    "沐曦股份": "国产GPU公司（MetaX），主打数据中心级AI计算芯片。",
+    "壁仞科技": "国产GPU公司（Biren），主打高性能通用GPU。",
+    "天数智芯": "国产GPU公司（Iluvatar），主打通用并行计算芯片。",
+    "算力": "设备或集群完成AI计算的能力，常指每秒可进行的运算次数。",
+    "集群": "多台计算设备连接在一起、协同工作的系统，可提供更强的整体算力。",
+    "推理卡": "专门用于AI推理（即“出结果”）的加速卡。",
+    "训练卡": "专门用于AI训练（即“学模型”）的加速卡。",
+    "制程(nm)": "芯片制造工艺的精细程度，数字越小通常代表工艺越先进、能效越高。",
+    "显存": "显卡上存放数据的专用内存，容量越大越能运行更大的模型。",
+    "互联(如NVLink)": "多张加速卡之间高速通信的技术，决定多卡协同的效率。",
+    "国产替代": "用国产芯片、软件替换国外产品的过程，旨在提升供应链自主可控。",
+    "信创": "信息技术应用创新，强调采用自主可控的软硬件体系。",
+    "英伟达(NVIDIA)": "美国GPU芯片巨头，是当前AI算力的主要供应商。",
+    "AMD": "美国半导体公司，生产CPU与GPU，在数据中心算力市场与英伟达竞争。",
+    "Intel(英特尔)": "美国芯片公司，生产CPU等，亦在拓展AI算力产品。",
+    "政企": "政府与企业的合称，这里指面向政府和大型企业的业务。",
+    "集采": "集中招标采购，通常由政府或大企业统一组织，强调规模与合规。",
+    "京东企业业务": "京东面向企业客户的采购与供应链服务。",
+    "京东云": "京东旗下的云计算与技术服务品牌。",
+    "数字化采购": "用系统或平台完成采购流程，提升效率、透明与合规。",
+    "供应链": "从原材料、生产到交付给客户的全流程协作网络。",
+    "统一内存": "将 CPU 与 GPU 共享同一块内存空间的设计，避免数据在两者之间反复拷贝，便于在单机上运行更大的模型。",
+    "超节点": "把多张 AI 加速卡通过高速互联组成一个超大算力单元（常达数百至上千卡），以提升大模型训练与推理效率。",
+    "PFLOPS": "每秒一千万亿次浮点运算，衡量算力大小的常用单位，数值越大代表算力越强。",
+    "TFLOPS": "每秒一万亿次浮点运算，衡量单颗芯片算力的常用单位。",
+    "Chiplet": "芯粒 / 小芯片，把不同功能的小芯片封装在一起的先进工艺，可在不追求最先进制程的前提下提升整体性能。",
+    "CXL": "Compute Express Link，一种用于 CPU 与内存、加速器之间高速互联的开放标准，常用于 AI 服务器的内存池化。",
+    "EFLOPS": "每秒一百亿亿次浮点运算，比 PFLOPS 更大的算力单位，常用于描述超节点级总算力。",
+    "RTX Spark": "英伟达推出的融合游戏、创作与 AI 的超级芯片 / 整机，主打本地大模型运行与统一内存。",
+    "AI工厂": "用规模化算力持续“生产”大模型 Token 与智能体的基础设施与企业形态。"
+  },
+  "sections": [
+    {
+      "id": "storage",
+      "name": "存储市场",
+      "accent": "#2563eb",
+      "dates": {
+        "2026-10-20": {
+          "summary": "今日存储市场动态主要集中在存储芯片价格调整和相关企业扩产计划上。",
+          "items": [
+            {
+              "title": "[News] ASE Reportedly Raises Advanced Packaging Quotes by More Than 20% in Latest AI-Driven Price Hike",
+              "source": "TrendForce 集邦咨询",
+              "url": "https://www.trendforce.com/news/2026/07/01/news-ase-reportedly-raises-advanced-packaging-quotes-by-more-than-20-in-latest-ai-driven-price-hike/",
+              "excerpt": "ASE 提高了先进封装报价，涨幅超过20%，反映出AI驱动的价格上涨趋势。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "[News] Musk’s TeraFab Lands First Major Hire as 18-Year Intel Veteran With 18A Experience Joins as Director",
+              "source": "TrendForce 集邦咨询",
+              "url": "https://www.trendforce.com/news/2026/07/01/news-musks-terafab-lands-first-major-hire-as-18-year-intel-veteran-with-18a-experience-joins-as-director/",
+              "excerpt": "马斯克的TeraFab迎来首位重要招聘，18年Intel老兵加入担任要职。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "[Insights] Memory Spot Price Update: DRAM Spot Prices See Gains in Low-Density DDR4 and DDR3 Amid Sideways Market",
+              "source": "TrendForce 集邦咨询",
+              "url": "https://www.trendforce.com/news/2026/07/01/insights-memory-spot-price-update-dram-spot-prices-see-gains-in-low-density-ddr4-and-ddr3-amid-sideways-market/",
+              "excerpt": "内存现货价格在低密度DDR4和DDR3中有所上涨，市场整体保持平稳。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "[News] Passive Component Prices Rise as YAGEO Reportedly Begins Broadest Capacitor Hike in Years on July 1",
+              "source": "TrendForce 集邦咨询",
+              "url": "https://www.trendforce.com/news/2026/07/01/news-passive-component-prices-rise-as-yageo-reportedly-begins-broadest-capacitor-hike-in-years-on-july-1/",
+              "excerpt": "YAGEO 于7月1日开始进行有史以来最广泛的电容价格上涨。",
+              "vendor": "",
+              "region": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "token",
+      "name": "Token 市场",
+      "accent": "#7c3aed",
+      "dates": {
+        "2026-10-20": {
+          "summary": "今日OpenAI和Anthropic均在推进AI技术的应用，OpenAI在多个行业展示了其模型的应用案例，而Anthropic则发布了关于支持和投资的公告。",
+          "items": [
+            {
+              "title": "Advancing coding in low‑resource programming languages",
+              "source": "OpenAI 官方",
+              "url": "https://openai.com/index/low-resource-programming-languages",
+              "excerpt": "OpenAI推进低资源编程语言的编码技术。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "How Itaú is building generative AI for its entire customer base",
+              "source": "OpenAI 官方",
+              "url": "https://openai.com/index/itau-generative-ai",
+              "excerpt": "Itaú利用生成AI服务其所有客户。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Stack Overflow for Agents triples signups with ChatGPT plugin",
+              "source": "OpenAI 官方",
+              "url": "https://openai.com/index/stack-overflow-chatgpt-plugin",
+              "excerpt": "Stack Overflow for Agents通过ChatGPT插件增加注册用户数量。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Benefit Street Partners answers questions faster with Codex",
+              "source": "OpenAI 官方",
+              "url": "https://openai.com/index/benefit-street-partners",
+              "excerpt": "Benefit Street Partners利用Codex更快地回答问题。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Bringing GPT-Rosalind to academic research labs",
+              "source": "OpenAI 官方",
+              "url": "https://openai.com/index/introducing-the-rosalind-academic-plan",
+              "excerpt": "OpenAI将GPT-Rosalind引入学术研究实验室。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Teaching students to think and learn through questions",
+              "source": "OpenAI 官方",
+              "url": "https://openai.com/index/teaching-students-to-think-and-learn-through-questions",
+              "excerpt": "OpenAI通过问题教授学生思考和学习。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Sullivan & Cromwell brings legal expertise into agreement review",
+              "source": "OpenAI 官方",
+              "url": "https://openai.com/index/sullivan-cromwell",
+              "excerpt": "Sullivan & Cromwell利用法律专长审查协议。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Amp puts AI agents to work beyond code with OpenAI models",
+              "source": "OpenAI 官方",
+              "url": "https://openai.com/index/amp-beyond-coding",
+              "excerpt": "Amp利用OpenAI模型将AI代理应用于代码之外。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "How to get support",
+              "source": "Anthropic 官方",
+              "url": "https://support.claude.com/en/articles/9015913-how-to-get-support",
+              "excerpt": "Anthropic提供获取支持的方法。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Download press kit",
+              "source": "Anthropic 官方",
+              "url": "https://anthropic.com/press-kit",
+              "excerpt": "Anthropic提供媒体套件下载。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Oct 18, 2026AnnouncementsInvesting in the public benefit",
+              "source": "Anthropic 官方",
+              "url": "https://www.anthropic.com/news/public-benefit-fund",
+              "excerpt": "Anthropic投资于公共利益。",
+              "vendor": "",
+              "region": ""
+            },
+            {
+              "title": "Oct 15, 2026AnnouncementsAn update on independent evaluators",
+              "source": "Anthropic 官方",
+              "url": "https://www.anthropic.com/news/an-update-on-independent-evaluators",
+              "excerpt": "Anthropic更新独立评估者情况。",
+              "vendor": "",
+              "region": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "compute",
+      "name": "算力市场",
+      "accent": "#0d9488",
+      "dates": {
+        "2026-10-20": {
+          "summary": "国外厂商：今日 NVIDIA 和 AMD 均发布了多条官方动态，涵盖了 AI、汽车技术、安全广播等多个领域。\n国内厂商：摩尔线程持续发布新产品和解决方案，推动国产GPU在AI领域的应用与发展。",
+          "items": [
+            {
+              "title": "NVIDIA 英伟达",
+              "source": "NVIDIA 英伟达",
+              "url": "https://blogs.nvidia.com/",
+              "excerpt": "NVIDIA 博客更新，讨论了工业 AI 和安全广播等内容。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 英伟达",
+              "source": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/news/nvidia-runs-record-simulation-of-fault-tolerant-quantum-computing-at-julich-supercomputing-centre",
+              "excerpt": "NVIDIA 在德国 Julich 超级计算中心进行了一次量子计算模拟，创下了记录。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 英伟达",
+              "source": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/news/nvidia-rtx-spark-pcs-available-today-a-new-beginning-for-windows-pcs",
+              "excerpt": "NVIDIA 推出 RTX Spark PC，为 Windows PC 带来新的开始。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 英伟达",
+              "source": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/news/volvo-cars-and-nvidia-expand-partnership-to-advance-safe-automated-driving",
+              "excerpt": "NVIDIA 与沃尔沃汽车扩大合作，推动安全自动驾驶技术。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 英伟达",
+              "source": "NVIDIA 英伟达",
+              "url": "https://blogs.nvidia.com/blog/germany-wants-to-lead-the-world-in-industrial-ai-how-nvidia-will-help/",
+              "excerpt": "NVIDIA 将帮助德国引领全球工业 AI 领域。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 英伟达",
+              "source": "NVIDIA 英伟达",
+              "url": "https://blogs.nvidia.com/blog/media-agentic-security-european-public-service-broadcasting-global-content-production/",
+              "excerpt": "NVIDIA 在欧洲公共广播安全和内容生产方面发挥作用。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 英伟达",
+              "source": "NVIDIA 英伟达",
+              "url": "https://blogs.nvidia.com/blog/local-ai-rtx-spark-windows-laptops-celebration/",
+              "excerpt": "NVIDIA 庆祝 RTX Spark Windows 笔记本电脑的推出。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 英伟达",
+              "source": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/news/mercedes-benz-and-nvidia-expand-strategic-partnership-to-advance-safe-highly-automated-driving-in-the-next-decade",
+              "excerpt": "NVIDIA 与梅赛德斯-奔驰扩大合作，推动未来十年安全高度自动驾驶技术。",
+              "vendor": "英伟达 NVIDIA",
+              "region": "foreign"
+            },
+            {
+              "title": "AMD 官方",
+              "source": "AMD 官方",
+              "url": "https://www.amd.com/news-types/news-blogs/",
+              "excerpt": "AMD 官方博客更新，涵盖新闻和行业动态。",
+              "vendor": "AMD",
+              "region": "foreign"
+            },
+            {
+              "title": "AMD 官方",
+              "source": "AMD 官方",
+              "url": "https://www.amd.com/news-types/press-kits/",
+              "excerpt": "AMD 官方发布新闻资料包。",
+              "vendor": "AMD",
+              "region": "foreign"
+            },
+            {
+              "title": "AMD 官方",
+              "source": "AMD 官方",
+              "url": "https://www.amd.com/en/blogs.html",
+              "excerpt": "AMD 官方博客更新，提供最新技术动态。",
+              "vendor": "AMD",
+              "region": "foreign"
+            },
+            {
+              "title": "AMD 官方",
+              "source": "AMD 官方",
+              "url": "https://www.amd.com/content/dam/amd/en/documents/corporate/cr/supply-chain-transparency.pdf",
+              "excerpt": "AMD 发布供应链透明度报告。",
+              "vendor": "AMD",
+              "region": "foreign"
+            },
+            {
+              "title": "词元时代，万物智能 | 摩尔线程 2026 产品发布会：打造全场景 AI 算力基石2026年5月18日",
+              "source": "摩尔线程",
+              "url": "https://www.mthreads.com/news/310",
+              "excerpt": "摩尔线程发布2026产品，打造全场景AI算力基石。",
+              "vendor": "摩尔线程",
+              "region": "domestic"
+            },
+            {
+              "title": "摩尔线程全栈算力支撑，无锡（惠山）国产智算中心一期满载运行2026年10月16日",
+              "source": "摩尔线程",
+              "url": "https://www.mthreads.com/news/353",
+              "excerpt": "摩尔线程支撑无锡国产智算中心一期满载运行。",
+              "vendor": "摩尔线程",
+              "region": "domestic"
+            },
+            {
+              "title": "MTT AIOS 1.6.0 发布｜内核更新、推理更快、AI 更好用2026年10月12日",
+              "source": "摩尔线程",
+              "url": "https://www.mthreads.com/news/352",
+              "excerpt": "摩尔线程发布MTT AIOS 1.6.0，提升AI推理性能。",
+              "vendor": "摩尔线程",
+              "region": "domestic"
+            },
+            {
+              "title": "国产 GPU 筑基 AI4S｜摩尔线程打通 Protenix-v2 全链路，加速生命科学与药物研发2026年9月24日",
+              "source": "摩尔线程",
+              "url": "https://www.mthreads.com/news/351",
+              "excerpt": "摩尔线程推出Protenix-v2，加速生命科学与药物研发。",
+              "vendor": "摩尔线程",
+              "region": "domestic"
+            },
+            {
+              "title": "喜报 | 摩尔线程入选全国及北京民营企业四大权威榜单2026年9月17日",
+              "source": "摩尔线程",
+              "url": "https://www.mthreads.com/news/349",
+              "excerpt": "摩尔线程入选全国及北京民营企业四大权威榜单。",
+              "vendor": "摩尔线程",
+              "region": "domestic"
+            },
+            {
+              "title": "äºè§£æ´å¤",
+              "source": "壁仞科技",
+              "url": "https://www.birentech.com/news/uk3x1bhhagcrtf5bqkurbnsa/",
+              "excerpt": "壁仞科技发布未知信息。",
+              "vendor": "壁仞科技",
+              "region": "domestic"
+            },
+            {
+              "title": "ä¼ä¸æ°é»",
+              "source": "壁仞科技",
+              "url": "https://www.birentech.com/news/",
+              "excerpt": "壁仞科技发布未知信息。",
+              "vendor": "壁仞科技",
+              "region": "domestic"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "jd",
+      "name": "京东政企市场",
+      "accent": "#dc2626",
+      "dates": {
+        "2026-10-20": {
+          "summary": "今日京东政企市场无特别显著的动态，主要涉及经营性网站备案信息。",
+          "items": [
+            {
+              "title": "经营性网站备案中心",
+              "source": "京东企业业务",
+              "url": "https://www.hd315.gov.cn/beian/view.asp?bianhao=010202007080200026",
+              "excerpt": "提供经营性网站的备案信息查询服务。",
+              "vendor": "",
+              "region": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "review",
+      "name": "周/月总结",
+      "accent": "#475569",
+      "type": "review",
+      "weekly": {},
+      "monthly": {}
+    }
+  ]
+}</script>
+<!--MARKET-DATA-END-->
+
+<script>
+  // 读取内嵌数据（自动化将改写 MARKET-DATA 区块）
+  function getSeed(){
+    try{
+      const el = document.getElementById('market-data');
+      return JSON.parse(el.textContent);
+    }catch(e){ return null; }
+  }
+
+  const DATA = getSeed();
+  const GLOSSARY = (DATA && DATA.glossary) || {};
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(s){ return escapeHtml(s); }
+
+  // 名词注释：把文本中的术语替换为带提示的样式
+  function annotate(text){
+    const terms = Object.keys(GLOSSARY).sort((a,b)=>b.length-a.length);
+    if(!terms.length) return escapeHtml(text);
+    const esc = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+    const parts = esc.map((t,i)=>{
+      const orig = terms[i];
+      if(/^[A-Za-z0-9 ./\-()]+$/.test(orig)) return '\\b'+t+'\\b';
+      return t;
+    });
+    const re = new RegExp('('+parts.join('|')+')','gi');
+    const termMap = {};
+    terms.forEach(t => termMap[t.toLowerCase()] = GLOSSARY[t]);
+    const escaped = escapeHtml(text);
+    let out='', last=0, m;
+    while((m = re.exec(escaped)) !== null){
+      out += escaped.slice(last, m.index);
+      const key = m[1];
+      const tip = termMap[key.toLowerCase()] || '';
+      out += '<span class="term" data-tip="'+escapeAttr(tip)+'">'+key+'</span>';
+      last = m.index + key.length;
+      if(m.index === re.lastIndex) re.lastIndex++;
+    }
+    out += escaped.slice(last);
+    return out;
+  }
+
+  // 收集所有出现过的日期（并集），用于日期选择（不含总结模块）
+  function allDates(){
+    const set = new Set();
+    (DATA.sections||[]).forEach(s=>{
+      if(s.type==='review') return;
+      Object.keys(s.dates||{}).forEach(d=>set.add(d));
+    });
+    return Array.from(set).sort().reverse();
+  }
+
+  function render(){
+    document.getElementById('boardTitle').textContent = DATA.meta.title || '分销市场动态看板';
+    document.getElementById('updatedAt').textContent = DATA.meta.updatedAt || '—';
+    const proto = document.getElementById('protoBadge');
+    if(DATA.meta.isPrototype){ proto.style.display='inline-block'; proto.textContent='设计原型 · 示例数据'; }
+    else { proto.style.display='none'; }
+
+    const dates = allDates();
+    const sel = document.getElementById('dateSel');
+    sel.innerHTML = dates.map(d=>'<option value="'+d+'">'+d+'</option>').join('') || '<option>暂无数据</option>';
+
+    document.getElementById('footer').textContent =
+      (DATA.meta.isPrototype ? DATA.meta.prototypeNote + ' · ' : '') +
+      '本看板所有动态均可点击“查看来源”跳转至官方权威网站。每日 9:30 更新；周总结每周一生成，月总结每月 1 日生成；历史保留 30 天。';
+
+    sel.onchange = ()=>renderGrid(sel.value);
+    renderGrid(dates[0]);
+    renderReview();
+    renderGlossary();
+  }
+
+  function renderGrid(date){
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    (DATA.sections||[]).filter(s=>s.type!=='review').forEach(sec=>{
+      const entry = (sec.dates||{})[date];
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.setProperty('--accent', sec.accent || '#2563eb');
+
+      let body = '';
+      if(!entry){
+        body = '<div class="empty">该日期暂无数据。</div>';
+      } else {
+        body += '<div class="summary"><span class="lbl">每日小结</span>'+annotate(entry.summary||'')+'</div>';
+        const items = entry.items || [];
+
+        if(sec.id === 'compute'){
+          const foreign = items.filter(i=>i.region==='foreign');
+          const domestic = items.filter(i=>i.region==='domestic');
+          body += groupHtml('国外厂商', foreign);
+          body += groupHtml('国内厂商', domestic);
+        } else {
+          body += itemsHtml(items);
+        }
+      }
+
+      card.innerHTML =
+        '<div class="card-head"><span class="dot"></span><h2>'+escapeHtml(sec.name)+'</h2>'+
+        '<span class="tag">每日动态</span></div>'+
+        '<div class="card-body">'+body+'</div>';
+      grid.appendChild(card);
+    });
+  }
+
+  function itemsHtml(items){
+    if(!items.length) return '<div class="empty">暂无动态条目。</div>';
+    return items.map(it=>{
+      const vendor = it.vendor ? '<span class="vendor">'+escapeHtml(it.vendor)+'</span>' : '';
+      const excerpt = it.excerpt ? '<p class="iexcerpt">'+annotate(it.excerpt)+'</p>' : '';
+      return '<div class="item">'+
+        '<p class="ititle">'+annotate(it.title||'')+'</p>'+
+        excerpt+
+        '<div class="meta">'+vendor+'<span class="src">'+escapeHtml(it.source||'来源')+'</span>'+
+        '<a class="link" href="'+escapeAttr(it.url||'#')+'" target="_blank" rel="noopener">查看来源 ↗</a></div>'+
+        '</div>';
+    }).join('');
+  }
+
+  function groupHtml(title, items){
+    if(!items.length) return '';
+    return '<div class="group-title">'+escapeHtml(title)+'</div>'+itemsHtml(items);
+  }
+
+  // 周/月总结模块
+  function renderReview(){
+    const sec = (DATA.sections||[]).find(s=>s.type==='review');
+    const panel = document.getElementById('reviewPanel');
+    if(!sec){ panel.innerHTML=''; return; }
+    const w = sec.weekly||{}, m = sec.monthly||{};
+    panel.innerHTML =
+      '<div class="review-head"><span class="dot" style="background:'+sec.accent+'"></span>'+
+      '<h2>'+escapeHtml(sec.name)+'</h2><span class="tag">自动生成</span></div>'+
+      '<div class="review-grid">'+
+        reviewCard('周总结', w.period, w.summary)+
+        reviewCard('月总结', m.period, m.summary)+
+      '</div>';
+  }
+  function reviewCard(title, period, summary){
+    return '<div class="review-card"><div class="rc-head">'+title+'</div>'+
+      (period?'<div class="rc-period">'+escapeHtml(period)+'</div>':'')+
+      '<div class="rc-body">'+(summary?annotate(summary):'<span class="empty">暂无</span>')+'</div></div>';
+  }
+
+  function renderGlossary(){
+    const list = document.getElementById('glossList');
+    list.innerHTML = Object.keys(GLOSSARY).sort((a,b)=>a.length-b.length).map(k=>
+      '<div class="gl-item"><div class="gt">'+escapeHtml(k)+'</div><div class="gd">'+escapeHtml(GLOSSARY[k])+'</div></div>'
+    ).join('');
+  }
+
+  // 术语表弹窗
+  document.getElementById('glossBtn').onclick = ()=> document.getElementById('glossModal').classList.add('open');
+  document.getElementById('glossClose').onclick = ()=> document.getElementById('glossModal').classList.remove('open');
+  document.getElementById('glossModal').onclick = (e)=>{ if(e.target.id==='glossModal') e.target.classList.remove('open'); };
+
+  // 导出功能
+  document.getElementById('btnHtml').onclick = exportHTML;
+  document.getElementById('btnPdf').onclick = ()=>window.print();
+  function exportHTML(){
+    const clone = document.querySelector('.wrap').cloneNode(true);
+    const tb = clone.querySelector('.toolbar'); if(tb) tb.remove();
+    const gb = clone.querySelector('.gloss-btn'); if(gb) gb.remove();
+    const css = Array.from(document.querySelectorAll('style')).map(s=>s.textContent).join('\n');
+    const doc = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>'+escapeHtml(DATA.meta.title)+'</title><style>'+css+'</style></head><body>'+clone.outerHTML+'</body></html>';
+    const blob = new Blob([doc], {type:'text/html;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (DATA.meta.title||'市场动态看板')+'_'+(DATA.meta.updatedAt||'')+'.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  }
+
+  render();
+</script>
+</body>
+</html>
