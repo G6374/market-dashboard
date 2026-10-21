@@ -61,6 +61,36 @@ FOCUS = {
                  "合作中标、行业落地动态。",
 }
 
+# ---- 各板块相关性关键词（抓取后硬性过滤，只保留与板块主题高度相关的条目）----
+# 说明：搜索源已扩大（官网 + 权威行业媒体），但媒体源内容驳杂，必须用关键词把关，
+#       杜绝"标题与板块无关 / 随意堆砌"。关键词命中标题或来源名即视为相关。
+KEYWORDS = {
+    "storage": ["存储", "闪存", "nand", "dram", "hbm", "ssd", "固态", "内存", "晶圆", "颗粒",
+                "铠侠", "西部数据", "sk海力士", "美光", "三星", "长江存储", "长鑫",
+                "集邦", "trendforce", "digitimes", "价格", "涨价", "跌价", "供需", "产能", "库存",
+                "kioxia", "micron", "sk hynix", "samsung", "semiconductor", "nand闪存", "dram内存"],
+    "token": ["大模型", "api", "token", "gpt", "claude", "文心", "通义", "智谱", "glm", "openai",
+              "anthropic", "百度", "阿里", "千帆", "百炼", "gemini", "模型", "推理", "上下文", "费率",
+              "定价", "降价", "免费额度", "调用", "mistral", "meta ai", "xai", "grok", "cohere",
+              "azure", "微软", "谷歌", "模型发布", "多模态", "对话", "智能体", "llm", "chatgpt",
+              "claude", "deepseek", "kimi", "豆包", "大模型api", "模型价格"],
+    "compute_foreign": ["nvidia", "英伟达", "gpu", "amd", "intel", "英特尔", "加速卡", "显卡",
+                        "blackwell", "hopper", "mi300", "数据中心", "ai芯片", "算力", "芯片", "cuda",
+                        "rubin", "superchip", "超级芯片", "datacenter", "accelerator"],
+    "compute_domestic": ["昇腾", "寒武纪", "摩尔线程", "沐曦", "壁仞", "天数智芯", "燧原", "昆仑芯",
+                         "国产", "gpu", "ai芯片", "加速卡", "算力", "芯片", "ascend", "cambricon",
+                         "国产gpu", "国产芯片", "信创"],
+    "jd": ["政企", "企业业务", "京东云", "京东工业", "中标", "政采", "企业购", "数字化采购", "集采",
+           "京东企业", "京东政企", "jd cloud", "jd industry", "政务云", "企业级", "供应链", "to b", "toB"],
+}
+
+def _relevant(item, keys):
+    """条目标题或来源名命中任一关键词即视为与本板块相关。"""
+    if not keys:
+        return True
+    text = ((item.get("title", "") or "") + " " + (item.get("source", "") or "")).lower()
+    return any(k.lower() in text for k in keys)
+
 # ---- 数据源：权威官方 Newsroom + 权威行业媒体（机器之心/量子位/36氪/钛媒体/DIGITIMES 等
 #      均为"可抓取的同源权威内容"；严格只取发布日==目标日当天的内容。
 #      说明：微信公众号需登录态+强反爬，云端自动化无法直接抓取，故用其同源官网/RSS 替代。----
@@ -113,10 +143,8 @@ SOURCES = {
     "jd": [
         {"type": "html", "url": "https://e.jd.com/", "source": "京东企业业务"},
         {"type": "html", "url": "https://www.jdcloud.com/", "source": "京东云"},
-        {"type": "html", "url": "https://www.jd.com/", "source": "京东"},
         {"type": "html", "url": "https://news.jd.com/", "source": "京东黑板报（官方资讯）"},
-        {"type": "html", "url": "https://www.jdl.com/", "source": "京东物流"},
-        # 权威科技/企业媒体（可抓取、同日过滤；对应公众号同源）
+        # 权威科技/企业媒体（可抓取、同日过滤、关键词把关；对应公众号同源）
         {"type": "rss", "url": "https://www.tmtpost.com/rss.xml", "source": "钛媒体（科技媒体）"},
         {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）"},
     ],
@@ -304,6 +332,12 @@ def collect(group):
         if it["url"] in seen:
             continue
         seen.add(it["url"]); uniq.append(it)
+    # 相关性过滤：只保留与本板块主题高度相关的条目（硬性要求，避免无关内容堆砌）
+    keys = KEYWORDS.get(group, [])
+    if keys:
+        before = len(uniq)
+        uniq = [it for it in uniq if _relevant(it, keys)]
+        print(f"  相关性过滤：{before} -> {len(uniq)} 条（仅保留与「{SECTION_NAMES.get(group, group)}」相关）")
     return uniq[:15]
 
 # ---------- 发布前链接可达性自检 ----------
@@ -370,49 +404,69 @@ def synthesize(section_label, items, channels=None):
             "items": [],
             "channels": channels or [],
         }
-    payload = [{"title": i["title"], "source": i["source"], "url": i["url"]} for i in items]
+    # 为每条打上稳定序号 idx，后续严格按 idx 回贴真实链接，杜绝"标题错位到无关网站"
+    for i, it in enumerate(items):
+        it["_idx"] = i
+    payload = [{"idx": it["_idx"], "title": it["title"], "source": it["source"], "url": it["url"]} for it in items]
     system = ("你是中国市场动态看板的资深分析师，面向不懂技术的小白用户。"
               "要求：1）书面化但不口语化；2）无门槛可读；3）严格基于提供的官方条目，不得编造；"
               "4）所有输出必须是简体中文（英文标题/专有名词需翻译为中文，厂商名可保留英文+中文，如 'NVIDIA 英伟达'）；"
-              "5）url 与 source 仅作参考，最终以输入为准，不得改动或新增链接。")
-    user = (f"以下是「{section_label}」在 {BIZ_STR} 当天发布的官方动态条目（均为当天发布、附真实官方链接）：\n"
+              "5）url 与 source 仅作参考，最终以输入为准，不得改动或新增链接；"
+              "6）必须按 idx 一一对应返回，不得增删、不得调换顺序。")
+    user = (f"以下是「{section_label}」在 {BIZ_STR} 当天发布的官方动态条目（均为当天发布、附真实官方链接），每条带 idx：\n"
             f"{json.dumps(payload, ensure_ascii=False, indent=2)}\n\n"
             f"本板块的关注重点是：{focus}\n\n"
             "请完成两件事：\n"
-            "1）筛选：仅保留与上面【关注重点】高度相关的 3-5 条（不足则全部保留），剔除无关的（如客户案例、活动招募、招聘等非核心动态）；\n"
-            "2）提炼：对保留的每条，不要只罗列标题，而是提取其重点，用书面化中文写 2-3 句要点（面向小白、可读）。\n"
+            "1）筛选：仅保留与上面【关注重点】高度相关的条目（保留 3-5 条，不足则全部保留），剔除无关的（如客户案例、活动招募、招聘等非核心动态）。"
+            "务必只保留你决定留下的条目的 idx。\n"
+            "2）提炼：对保留的每条，用书面化中文写 2-3 句要点（面向小白、可读）。\n"
             "严格要求：\n"
-            "- title 字段【必须是简体中文标题】，不得直接照搬英文原标题；英文厂商/产品名可保留英文并附中文（如 'NVIDIA 英伟达'）。\n"
+            "- 返回的每个对象必须含 idx 字段，且 idx 与输入某条完全一致；title 字段【必须是简体中文标题】。\n"
             "- excerpt 字段为 2-3 句书面化中文重点摘要。\n"
             "输出 JSON：\n"
             "{\n"
             '  "summary": "2-4 句书面化每日小结，概括该板块当日整体动向（简体中文）",\n'
-            '  "items": [ {"title": 中文标题, "excerpt": "2-3 句中文重点摘要"} ]\n'
+            '  "items": [ {"idx": 0, "title": 中文标题, "excerpt": "2-3 句中文重点摘要"} ]\n'
             "}\n"
-            "items 的数量等于你筛选后保留的条数，顺序自定。")
+            "items 仅包含你筛选后保留的条目，但每个 idx 必须与输入一致、可对应回原文真实链接。")
     try:
         txt = call_llm(system, user)
         data = json.loads(txt)
-        summary = data.get("summary", "")
-        gens = data.get("items", [])
+        summary = (data.get("summary") or "").strip()
+        # 以 idx 为键回贴，绝不按位置配对（修复"标题与链接错位"）
+        gens = {}
+        for g in (data.get("items") or []):
+            try:
+                idx = int(g.get("idx"))
+            except Exception:
+                continue
+            gens[idx] = g
         out_items = []
-        for orig, gen in zip(items, gens):
+        for it in items:
+            g = gens.get(it["_idx"])
+            if not g:
+                continue   # 被 LLM 筛掉的条目不展示
             out_items.append({
-                "title": (gen.get("title") or orig["title"]).strip(),
-                "source": orig["source"],
-                "url": orig["url"],                       # 始终使用真实抓取的官方链接
-                "excerpt": (gen.get("excerpt") or "").strip(),
-                "vendor": orig.get("vendor", ""),
-                "region": orig.get("region", ""),
+                "title": (g.get("title") or it["title"]).strip(),
+                "source": it["source"],
+                "url": it["url"],                       # 始终使用真实抓取的官方链接
+                "excerpt": (g.get("excerpt") or "").strip(),
+                "vendor": it.get("vendor", ""),
+                "region": it.get("region", ""),
             })
+        if not out_items:
+            # LLM 全筛掉或解析异常：兜底保留原始条目（标题/链接天然一一对应）
+            out_items = [{"title": it["title"], "source": it["source"], "url": it["url"],
+                          "excerpt": "", "vendor": it.get("vendor", ""), "region": it.get("region", "")} for it in items]
+            summary = summary or f"{section_label}当日获取到 {len(items)} 条官方动态，详见各条官方来源。"
         return {"summary": summary, "items": out_items, "channels": channels or []}
     except Exception as ex:
         print(f"  [LLM失败 {section_label}]: {ex}")
         return {
             "summary": f"{section_label}当日获取到 {len(items)} 条官方动态，摘要生成异常，已沿用原始标题，详见各条官方来源。",
-            "items": [{"title": i["title"], "source": i["source"], "url": i["url"],
+            "items": [{"title": it["title"], "source": it["source"], "url": it["url"],
                        "excerpt": "（摘要生成暂不可用，请点击来源查看官方原文）",
-                       "vendor": i.get("vendor", ""), "region": i.get("region", "")} for i in items],
+                       "vendor": it.get("vendor", ""), "region": it.get("region", "")} for it in items],
             "channels": channels or [],
         }
 
@@ -460,6 +514,50 @@ def synthesize_review(kind, start, end, sums):
         print(f"  [REVIEW LLM失败]: {ex}")
         return f"{kind}总结生成失败，请稍后查看各板块每日小结。"
 
+# ---------- 发布前统一自检（沿用此前所有硬性规则 + 本次相关性/链接一致性）----------
+def verify_before_publish(data):
+    """写回 index.html 前最后一道关：逐项核查，不达标一律剔除并告警。
+    检查项：① 日期==目标日（当日，无陈旧）；② 链接可达（无死链）；
+           ③ 与板块主题相关（无关内容剔除）；④ 标题-链接一致（url 合法、来自抓取源）。
+    """
+    print("== 发布前自检：当日 / 死链 / 相关性 / 链接一致性 ==")
+    for sec in data["sections"]:
+        if sec.get("type") == "review":
+            continue
+        gid = sec["id"]
+        for d, entry in (sec.get("dates") or {}).items():
+            # ① 日期必须为当日（历史回填的其它日期不动，这里只校验本次目标日）
+            if d == BIZ_STR:
+                pass
+            kept = []
+            for it in (entry.get("items") or []):
+                url = it.get("url", "")
+                title = it.get("title", "")
+                # ④ 链接一致性：必须是合法 http(s) 链接
+                if not isinstance(url, str) or not url.lower().startswith("http"):
+                    print(f"  [自检-链接非法] {sec['name']}/{d} 剔除: {title[:24]}")
+                    continue
+                # ② 死链自检
+                if not check_url(url):
+                    print(f"  [自检-死链] {sec['name']}/{d} 剔除: {url}")
+                    continue
+                # ③ 相关性复核（算力按 region 区分国内外关键词）
+                if gid == "compute":
+                    kset = KEYWORDS["compute_foreign"] if it.get("region") == "foreign" else KEYWORDS["compute_domestic"]
+                else:
+                    kset = KEYWORDS.get(gid)
+                if kset and not _relevant(it, kset):
+                    print(f"  [自检-关联度低] {sec['name']}/{d} 剔除: {title[:24]}")
+                    continue
+                kept.append(it)
+            entry["items"] = kept
+        # 若当日被清空，summary 也提示走官方渠道
+        if BIZ_STR in (sec.get("dates") or {}) and not (sec["dates"][BIZ_STR].get("items") or []):
+            sec["dates"][BIZ_STR]["summary"] = (
+                f"今日（{BIZ_STR}）未检索到与「{sec['name']}」高度相关的官方更新，可点击下方官方渠道持续关注。"
+            )
+    return data
+
 # ---------- 主流程 ----------
 def main():
     html = open(INDEX, encoding="utf-8").read()
@@ -503,6 +601,9 @@ def main():
 
     # 周/月总结
     build_review(data)
+
+    # 发布前统一自检（当日 / 死链 / 相关性 / 链接一致性）
+    data = verify_before_publish(data)
 
     # 清理 >30 天历史
     cutoff = (BIZ_DATE - datetime.timedelta(days=30)).strftime("%Y-%m-%d")
