@@ -122,38 +122,11 @@
   .exp-btn{font:inherit; padding:7px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; color:#2563eb; cursor:pointer; font-weight:600; margin-left:8px;}
   .exp-btn:hover{background:#eff6ff;}
   @media print{
-    .toolbar,.gloss-btn,.modal,.tabs{display:none !important;}
-    .page{display:block !important;}
+    .toolbar,.gloss-btn,.modal{display:none !important;}
     body{background:#fff;}
-    .card,.review-wrap,.price-wrap{box-shadow:none; border-color:#d1d5db;}
+    .card,.review-wrap{box-shadow:none; border-color:#d1d5db;}
     .wrap{padding:0;}
   }
-  /* 存储价格变动模块（每周四更新，独立于日期选择器） */
-  .price-wrap{margin-top:22px; background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:18px 20px;}
-  .price-head{display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:14px;}
-  .price-head h2{font-size:17px; margin:0; flex:1;}
-  .price-note{font-size:12px; color:var(--muted); white-space:nowrap;}
-  .price-table{width:100%; border-collapse:collapse; font-size:13px;}
-  .price-table th,.price-table td{padding:9px 10px; text-align:left; border-bottom:1px solid var(--line); vertical-align:middle;}
-  .price-table th{font-size:12px; color:var(--muted); font-weight:700; letter-spacing:.5px; background:#f8fafc; white-space:nowrap;}
-  .price-table td.r{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;}
-  .price-table tr:hover td{background:#fafbff;}
-  .price-brand{font-weight:700; color:var(--ink);}
-  .up{color:#dc2626; font-weight:700;}   /* 涨 = 红（A股习惯） */
-  .down{color:#16a34a; font-weight:700;} /* 跌 = 绿 */
-  .flat{color:var(--muted);}
-  .brand-group-label{font-size:13px; font-weight:700; color:#475569; margin:14px 0 6px; border-left:3px solid var(--accent,#ea580c); padding-left:8px;}
-  .spark{display:block;}
-  /* 顶部三页导航 */
-  .tabs{display:flex; gap:4px; margin-top:20px; border-bottom:2px solid var(--line); flex-wrap:wrap;}
-  .tab{
-    font:inherit; border:none; background:none; cursor:pointer;
-    padding:10px 18px 12px; font-size:15px; font-weight:600; color:var(--muted);
-    border-bottom:3px solid transparent; margin-bottom:-2px; letter-spacing:.5px;
-  }
-  .tab:hover{color:var(--ink);}
-  .tab.active{color:#2563eb; border-bottom-color:#2563eb;}
-  .page.hidden{display:none;}
 </style>
 </head>
 <body>
@@ -166,30 +139,17 @@
     <span class="proto-badge" id="protoBadge">设计原型 · 示例数据</span>
   </header>
 
-  <nav class="tabs" id="tabs">
-    <button class="tab active" data-page="news" type="button">市场动态</button>
-    <button class="tab" data-page="price" type="button">存储价格变动</button>
-    <button class="tab" data-page="review" type="button">总结</button>
-  </nav>
+  <div class="toolbar">
+    <label for="dateSel">更新日期</label>
+    <select id="dateSel"></select>
+    <div class="updated">数据更新于：<b id="updatedAt">—</b></div>
+    <button id="btnHtml" class="exp-btn">导出 HTML</button>
+    <button id="btnPdf" class="exp-btn">导出 PDF</button>
+  </div>
 
-  <section class="page" id="pageNews">
-    <div class="toolbar">
-      <label for="dateSel">更新日期</label>
-      <select id="dateSel"></select>
-      <div class="updated">数据更新于：<b id="updatedAt">—</b></div>
-      <button id="btnHtml" class="exp-btn">导出 HTML</button>
-      <button id="btnPdf" class="exp-btn">导出 PDF</button>
-    </div>
-    <div class="grid" id="grid"></div>
-  </section>
+  <div class="grid" id="grid"></div>
 
-  <section class="page hidden" id="pagePrice">
-    <div class="price-wrap" id="pricePanel"></div>
-  </section>
-
-  <section class="page hidden" id="pageReview">
-    <div class="review-wrap" id="reviewPanel"></div>
-  </section>
+  <div class="review-wrap" id="reviewPanel"></div>
 
   <footer id="footer"></footer>
 </div>
@@ -1065,452 +1025,7 @@
       "weekly": {},
       "monthly": {}
     }
-  ],
-  "priceModule": {
-    "title": "存储价格变动",
-    "subtitle": "每周四更新 · 数据来源：内存价格跟进（京东/条）",
-    "weeks": [
-      "2026-09-18",
-      "2026-09-24",
-      "2026-09-30",
-      "2026-10-08",
-      "2026-10-15"
-    ],
-    "items": [
-      {
-        "brand": "三星",
-        "model": "16GB DDR4 3200",
-        "link": "",
-        "prices": [
-          1399.0,
-          1399.0,
-          1395.94,
-          1399.0,
-          1399.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00218727662616147,
-          0.00219207129246235,
-          0.0
-        ]
-      },
-      {
-        "brand": "三星",
-        "model": "32GB DDR4 3200",
-        "link": "",
-        "prices": [
-          3083.51,
-          3083.51,
-          3095.94,
-          3299.0,
-          3299.0
-        ],
-        "yoy": [
-          0.0,
-          0.0040311203790484,
-          0.0655891264042585,
-          0.0
-        ]
-      },
-      {
-        "brand": "三星",
-        "model": "32GB DDR5 4800",
-        "link": "",
-        "prices": [
-          3780.0,
-          3799.0,
-          3795.94,
-          3799.0,
-          3899.0
-        ],
-        "yoy": [
-          0.00502645502645493,
-          -0.000805475125032928,
-          0.000806124438215594,
-          0.0263227165043431
-        ]
-      },
-      {
-        "brand": "海力士",
-        "model": "16GB DDR4 3200",
-        "link": "",
-        "prices": [
-          859.0,
-          859.0,
-          852.94,
-          859.0,
-          859.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00705471478463326,
-          0.00710483738598255,
-          0.0
-        ]
-      },
-      {
-        "brand": "海力士",
-        "model": "32GB DDR4 3200",
-        "link": "",
-        "prices": [
-          1999.0,
-          1999.0,
-          1992.94,
-          1999.0,
-          2099.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00303151575787897,
-          0.00304073379027958,
-          0.0500250125062531
-        ]
-      },
-      {
-        "brand": "海力士",
-        "model": "32GB DDR5 4800",
-        "link": "",
-        "prices": [
-          3499.0,
-          3499.0,
-          3492.94,
-          3499.0,
-          3499.0
-        ],
-        "yoy": [
-          0.0,
-          -0.0017319234066876,
-          0.00173492816939302,
-          0.0
-        ]
-      },
-      {
-        "brand": "美光",
-        "model": "16GB DDR4 3200",
-        "link": "",
-        "prices": [
-          759.0,
-          759.0,
-          755.94,
-          759.0,
-          759.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00403162055335959,
-          0.00404794031272315,
-          0.0
-        ]
-      },
-      {
-        "brand": "美光",
-        "model": "32GB DDR4 3200",
-        "link": "",
-        "prices": [
-          1659.0,
-          1659.0,
-          1655.94,
-          1659.0,
-          1659.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00184448462929476,
-          0.00184789303960287,
-          0.0
-        ]
-      },
-      {
-        "brand": "美光",
-        "model": "32GB DDR5 4800",
-        "link": "",
-        "prices": [
-          3499.0,
-          3499.0,
-          3495.94,
-          3499.0,
-          3499.0
-        ],
-        "yoy": [
-          0.0,
-          -0.000874535581594671,
-          0.000875301063519407,
-          0.0
-        ]
-      },
-      {
-        "brand": "金士顿",
-        "model": "16GB DDR4 3200",
-        "link": "",
-        "prices": [
-          1459.0,
-          1389.0,
-          1385.94,
-          1389.0,
-          1359.0
-        ],
-        "yoy": [
-          -0.0479780671692941,
-          -0.00220302375809933,
-          0.00220788778735015,
-          -0.021598272138229
-        ]
-      },
-      {
-        "brand": "金士顿",
-        "model": "32GB DDR4 3200",
-        "link": "",
-        "prices": [
-          3099.0,
-          3499.0,
-          3495.94,
-          3499.0,
-          3299.0
-        ],
-        "yoy": [
-          0.129073894804776,
-          -0.000874535581594671,
-          0.000875301063519407,
-          -0.0571591883395256
-        ]
-      },
-      {
-        "brand": "金士顿",
-        "model": "16GB DDR5 5600",
-        "link": "",
-        "prices": [
-          1899.0,
-          1939.0,
-          1935.94,
-          1939.0,
-          1939.0
-        ],
-        "yoy": [
-          0.0210637177461821,
-          -0.00157813305827748,
-          0.00158062749878618,
-          0.0
-        ]
-      },
-      {
-        "brand": "威刚",
-        "model": "16GB DDR4 3200",
-        "link": "",
-        "prices": [
-          989.0,
-          989.0,
-          985.94,
-          969.0,
-          889.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00309403437815969,
-          -0.0171815729151876,
-          -0.0825593395252838
-        ]
-      },
-      {
-        "brand": "威刚",
-        "model": "32GB DDR4 3200",
-        "link": "",
-        "prices": [
-          2188.01,
-          2199.0,
-          2188.94,
-          2148.0,
-          2149.0
-        ],
-        "yoy": [
-          0.00502282896330453,
-          -0.00457480673033195,
-          -0.0187031165769733,
-          0.000465549348230843
-        ]
-      },
-      {
-        "brand": "威刚",
-        "model": "16GB DDR5 5600",
-        "link": "",
-        "prices": [
-          1699.0,
-          1699.0,
-          1688.94,
-          1792.0,
-          1689.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00592113007651551,
-          0.0610205217473681,
-          -0.0574776785714286
-        ]
-      },
-      {
-        "brand": "金百达",
-        "model": "银爵 16GB DDR4 3200",
-        "link": "",
-        "prices": [
-          799.0,
-          799.0,
-          795.94,
-          799.0,
-          799.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00382978723404248,
-          0.00384451089278071,
-          0.0
-        ]
-      },
-      {
-        "brand": "金百达",
-        "model": "银爵 16GB DDR5 4800",
-        "link": "",
-        "prices": [
-          1594.0,
-          1599.0,
-          1599.0,
-          1592.0,
-          1589.0
-        ],
-        "yoy": [
-          0.00313676286072773,
-          0.0,
-          -0.00437773608505321,
-          -0.00188442211055273
-        ]
-      },
-      {
-        "brand": "金百达",
-        "model": "银爵 32GB DDR5 6000",
-        "link": "",
-        "prices": [
-          3299.0,
-          3299.0,
-          3992.94,
-          3299.0,
-          3259.0
-        ],
-        "yoy": [
-          0.0,
-          0.210348590481964,
-          -0.173791742425381,
-          -0.0121248863291906
-        ]
-      },
-      {
-        "brand": "光威",
-        "model": "天策 16GB DDR4 3200",
-        "link": "",
-        "prices": [
-          769.0,
-          769.0,
-          765.94,
-          779.0,
-          759.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00397919375812739,
-          0.0170509439381674,
-          -0.0256739409499358
-        ]
-      },
-      {
-        "brand": "光威",
-        "model": "天策 16GB DDR5 5200",
-        "link": "",
-        "prices": [
-          1029.0,
-          1029.0,
-          1345.94,
-          1399.0,
-          1329.0
-        ],
-        "yoy": [
-          0.0,
-          0.308007774538387,
-          0.039422262507987,
-          -0.050035739814153
-        ]
-      },
-      {
-        "brand": "光威",
-        "model": "龙武 32GB DDR5 6000",
-        "link": "",
-        "prices": [
-          2699.0,
-          2699.0,
-          2695.94,
-          2749.0,
-          2749.0
-        ],
-        "yoy": [
-          0.0,
-          -0.00113375324194143,
-          0.0196814469164743,
-          0.0
-        ]
-      },
-      {
-        "brand": "芝奇",
-        "model": "16GB DDR4 3200",
-        "link": "",
-        "prices": [
-          1299.0,
-          1299.0,
-          1185.94,
-          1289.0,
-          1199.0
-        ],
-        "yoy": [
-          0.0,
-          -0.0870361816782139,
-          0.0869015295883433,
-          -0.069821567106284
-        ]
-      },
-      {
-        "brand": "芝奇",
-        "model": "32GB DDR4 3600",
-        "link": "",
-        "prices": [
-          1799.0,
-          1799.0,
-          1798.0,
-          1888.0,
-          2089.0
-        ],
-        "yoy": [
-          0.0,
-          -0.000555864369093939,
-          0.0500556173526141,
-          0.10646186440678
-        ]
-      },
-      {
-        "brand": "芝奇",
-        "model": "16GB DDR5 6000",
-        "link": "",
-        "prices": [
-          1959.0,
-          1939.0,
-          2095.94,
-          1989.0,
-          1989.0
-        ],
-        "yoy": [
-          -0.0102092904543134,
-          0.0809386281588449,
-          -0.0510224529328129,
-          0.0
-        ]
-      }
-    ]
-  }
+  ]
 }</script>
 <!--MARKET-DATA-END-->
 
@@ -1587,31 +1102,13 @@
     sel.innerHTML = dates.map(d=>'<option value="'+d+'">'+d+'</option>').join('') || '<option>暂无数据</option>';
 
     document.getElementById('footer').textContent =
-      '数据更新于 ' + (DATA.meta.updatedAt || '—') + ' · ' +
       (DATA.meta.isPrototype ? DATA.meta.prototypeNote + ' · ' : '') +
       '本看板所有动态均可点击“查看来源”跳转至官方权威网站。每日北京时间 24:00 更新（仅收录当日发布的资讯）；周总结每周日 24:00 生成，月总结每月最后一天 24:00 生成；历史保留 30 天。';
-
-    // 三页导航：切换 + hash 记忆（刷新/分享链接停留在原页）
-    const pageMap = {news:'pageNews', price:'pagePrice', review:'pageReview'};
-    function showTab(name){
-      Object.keys(pageMap).forEach(k=>{
-        document.getElementById(pageMap[k]).classList.toggle('hidden', k!==name);
-        const btn = document.querySelector('.tab[data-page="'+k+'"]');
-        if(btn) btn.classList.toggle('active', k===name);
-      });
-      if(location.hash !== '#'+name) history.replaceState(null, '', '#'+name);
-    }
-    document.querySelectorAll('.tab').forEach(b=>{
-      b.addEventListener('click', ()=>showTab(b.dataset.page));
-    });
-    const initial = (location.hash||'').replace('#','');
-    showTab(pageMap[initial] ? initial : 'news');
 
     sel.onchange = ()=>renderGrid(sel.value);
     renderGrid(dates[0]);
     annotatedCache = new Set();   // 总结模块独立计"首次出现"
     renderReview();
-    renderPrice();
     renderGlossary();
   }
 
@@ -1695,10 +1192,7 @@
   function renderReview(){
     const sec = (DATA.sections||[]).find(s=>s.type==='review');
     const panel = document.getElementById('reviewPanel');
-    if(!sec){
-      panel.innerHTML = '<div class="empty">暂无总结内容。周总结于每周日 24:00 随当日更新自动生成，月总结于每月最后一天 24:00 自动生成，届时在此页展示。</div>';
-      return;
-    }
+    if(!sec){ panel.innerHTML=''; return; }
     const w = sec.weekly||{}, m = sec.monthly||{};
     panel.innerHTML =
       '<div class="review-head"><span class="dot" style="background:'+sec.accent+'"></span>'+
@@ -1721,71 +1215,6 @@
     ).join('');
   }
 
-  // 存储价格变动模块（每周四更新，独立于日期选择器；generate.py 每日重写不会触碰它）
-  function sparkline(prices){
-    const nums = (prices||[]).filter(v=>v!=null && v!=='').map(Number);
-    if(nums.length<2) return '<span class="flat">—</span>';
-    const w=96,h=28,pad=4;
-    const min=Math.min.apply(null,nums), max=Math.max.apply(null,nums);
-    const span=(max-min)||1;
-    const pts = nums.map(function(v,i){
-      const x = pad + i*(w-2*pad)/(nums.length-1);
-      const y = h-pad - (v-min)/span*(h-2*pad);
-      return x.toFixed(1)+','+y.toFixed(1);
-    }).join(' ');
-    const lastUp = nums[nums.length-1] >= nums[nums.length-2];
-    const col = lastUp ? '#dc2626' : '#16a34a';   // 涨红跌绿（A股习惯）
-    return '<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="1.6" stroke-linejoin="round"/></svg>';
-  }
-
-  function renderPrice(){
-    const pm = DATA.priceModule;
-    const panel = document.getElementById('pricePanel');
-    if(!pm || !pm.items || !pm.items.length){
-      panel.style.display='';
-      panel.innerHTML = '<div class="price-head"><h2>'+escapeHtml((pm&&pm.title)||'存储价格变动')+'</h2></div>'+
-        '<div class="empty">暂无价格数据。价格表每周四随最新 xlsx 数据更新，届时在此页展示。</div>';
-      return;
-    }
-    panel.style.display='';
-    const weeks = pm.weeks||[];
-    const latest = weeks.length?weeks[weeks.length-1]:'';
-    const prevWk = weeks.length>1?weeks[weeks.length-2]:'';
-    let html = '<div class="price-head"><h2>'+escapeHtml(pm.title||'存储价格变动')+'</h2>'+
-      '<span class="price-note">'+(pm.subtitle||'')+'</span></div>';
-    html += '<table class="price-table"><thead><tr>'+
-      '<th>品牌</th><th>型号</th>'+
-      '<th class="r">最新价('+escapeHtml(latest)+')</th>'+
-      (prevWk?'<th class="r">上周价('+escapeHtml(prevWk)+')</th>':'')+
-      '<th class="r">周环比</th><th class="r">同比</th>'+
-      '<th>近'+weeks.length+'周走势</th><th>链接</th></tr></thead><tbody>';
-    pm.items.forEach(function(it){
-      const prices=(it.prices||[]).map(function(v){ return (v===''||v==null)?null:Number(v); });
-      const yoy=(it.yoy||[]).map(function(v){ return (v===''||v==null)?null:Number(v); });
-      const last = prices.length?prices[prices.length-1]:null;
-      const prev = prices.length>1?prices[prices.length-2]:null;
-      let wkPct=null,wkCls='flat';
-      if(last!=null && prev!=null && prev!==0){ wkPct=(last-prev)/prev*100; wkCls = wkPct>0?'up':(wkPct<0?'down':'flat'); }
-      const lastYoy = yoy.length?yoy[yoy.length-1]:null;
-      let yoyPct = (lastYoy!=null)?lastYoy*100:null;
-      const yoyCls = (yoyPct!=null)?(yoyPct>0?'up':(yoyPct<0?'down':'flat')):'flat';
-      const fmt = function(v){ return (v==null)?'—':'¥'+Number(v).toLocaleString('zh-CN',{maximumFractionDigits:2}); };
-      const modelCell = it.link ? '<a href="'+escapeAttr(it.link)+'" target="_blank" rel="noopener">'+escapeHtml(it.model||'')+'</a>' : escapeHtml(it.model||'');
-      html += '<tr>'+
-        '<td class="price-brand">'+escapeHtml(it.brand||'—')+'</td>'+
-        '<td>'+modelCell+'</td>'+
-        '<td class="r '+wkCls+'">'+fmt(last)+'</td>'+
-        (prevWk?'<td class="r">'+fmt(prev)+'</td>':'')+
-        '<td class="r '+wkCls+'">'+(wkPct==null?'—':(wkPct>0?'+':'')+wkPct.toFixed(2)+'%')+'</td>'+
-        '<td class="r '+yoyCls+'">'+(yoyPct==null?'—':(yoyPct>0?'+':'')+yoyPct.toFixed(2)+'%')+'</td>'+
-        '<td>'+sparkline(prices)+'</td>'+
-        '<td>'+(it.link?'<a href="'+escapeAttr(it.link)+'" target="_blank" rel="noopener">查看</a>':'—')+'</td>'+
-      '</tr>';
-    });
-    html += '</tbody></table>';
-    panel.innerHTML = html;
-  }
-
   // 术语表弹窗
   document.getElementById('glossBtn').onclick = ()=> document.getElementById('glossModal').classList.add('open');
   document.getElementById('glossClose').onclick = ()=> document.getElementById('glossModal').classList.remove('open');
@@ -1798,8 +1227,6 @@
     const clone = document.querySelector('.wrap').cloneNode(true);
     const tb = clone.querySelector('.toolbar'); if(tb) tb.remove();
     const gb = clone.querySelector('.gloss-btn'); if(gb) gb.remove();
-    const nv = clone.querySelector('.tabs'); if(nv) nv.remove();          // 导出为单页全量：去掉导航
-    clone.querySelectorAll('.page').forEach(p=>p.classList.remove('hidden')); // 三页内容全部展开
     const css = Array.from(document.querySelectorAll('style')).map(s=>s.textContent).join('\n');
     const doc = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>'+escapeHtml(DATA.meta.title)+'</title><style>'+css+'</style></head><body>'+clone.outerHTML+'</body></html>';
     const blob = new Blob([doc], {type:'text/html;charset=utf-8'});
