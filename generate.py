@@ -14,6 +14,10 @@
    一律剔除，保证页面上不出现"打不开"的来源。
 3. 外文（英文等）标题与要点统一翻译为书面化中文；先筛选本板块关注的要点，
    再提炼每条 2-3 句中文重点，源链接仅作参考、不得改动。
+4. 相关性：无论官方厂商还是行业媒体，标题必须命中本板块/本区域关键词才保留；
+   无关内容（客户案例、活动招募、招聘、非目标厂商等）一律剔除。
+5. 优先级：官网/厂商官方消息优先；若当日官方无新资讯，再从其他权威渠道（行业媒体）抓取。
+6. 国内外分列：存储、Token、算力均分"国外 / 国内"两组，分别展示、分别把关。
 
 仅改写 index.html 中 <!--MARKET-DATA-START--> ~ <!--MARKET-DATA-END--> 之间的 JSON，
 绝不改动页面其它代码。
@@ -28,17 +32,19 @@ from zoneinfo import ZoneInfo
 HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX = os.path.join(HERE, "index.html")
 
-# ---- LLM 供应商：主用 DeepSeek，失败回退 SiliconFlow（免费兜底）----
+# ---- LLM 供应商：主用 DeepSeek（需有余额），失败回退 SiliconFlow 免费模型（按能力从强到弱）----
 PRIMARY = (
     os.environ.get("LLM_API_URL", "https://api.deepseek.com/v1/chat/completions"),
     os.environ.get("LLM_API_KEY", ""),
     os.environ.get("LLM_MODEL", "deepseek-chat"),
 )
-FALLBACK = (
-    os.environ.get("FALLBACK_API_URL", "https://api.siliconflow.cn/v1/chat/completions"),
-    os.environ.get("FALLBACK_API_KEY", ""),
-    os.environ.get("FALLBACK_MODEL", "Qwen/Qwen2.5-7B-Instruct"),
-)
+_SF_URL = os.environ.get("FALLBACK_API_URL", "https://api.siliconflow.cn/v1/chat/completions")
+_SF_KEY = os.environ.get("FALLBACK_API_KEY", "")
+FALLBACKS = [
+    (_SF_URL, _SF_KEY, os.environ.get("FALLBACK_MODEL", "Qwen/Qwen2.5-72B-Instruct")),
+    (_SF_URL, _SF_KEY, "Qwen/Qwen2.5-32B-Instruct"),
+    (_SF_URL, _SF_KEY, "Qwen/Qwen2.5-7B-Instruct"),
+]
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"
 TZ = ZoneInfo("Asia/Shanghai")
@@ -49,10 +55,13 @@ BIZ_STR = BIZ_DATE.strftime("%Y-%m-%d")
 
 # ---- 各板块关注重点（用于约束 LLM 筛选，避免跑偏）----
 FOCUS = {
-    "storage": "存储芯片（NAND / DRAM / HBM 等）的价格走势、供需关系、产能变化，以及主要厂商"
-                "（三星、SK 海力士、美光、铠侠、西部数据、长江存储、长鑫存储等）的动态。",
-    "token": "主流大模型 API（文心、通义、GLM、GPT、Claude 等）的计费与 Token 价格、用量与配额、"
-             "新模型发布、上下文窗口与费率变动、API 相关功能更新。",
+    "存储市场·国外": "国际存储芯片（NAND / DRAM / HBM 等）的价格走势、供需关系、产能变化，以及主要国际厂商"
+                "（三星、SK 海力士、美光、铠侠、西部数据等）的动态。",
+    "存储市场·国内": "国产存储芯片（长江存储、长鑫存储、兆易创新、澜起科技等）的产品、产能、技术与市场动态。",
+    "Token 市场·国外": "国际主流大模型 API（GPT、Claude、Gemini、Llama、Mistral、Grok、Cohere 等）的计费与"
+                   "Token 价格、用量与配额、新模型发布、上下文窗口与费率变动、API 相关功能更新。",
+    "Token 市场·国内": "国产大模型 API（文心、通义、智谱 GLM、Kimi、DeepSeek、豆包、讯飞星火等）的计费与"
+                   "Token 价格、新模型发布、API 功能更新与费率变动。",
     "算力市场·国外厂商": "NVIDIA 英伟达、AMD、Intel 英特尔 在 AI 算力领域的新品发布、量产、技术突破、"
                       "合作与客户落地、财报与业绩动态。",
     "算力市场·国内厂商": "华为昇腾、寒武纪、摩尔线程、沐曦、壁仞、天数智芯 等国产 AI 芯片厂商的新品发布、"
@@ -61,150 +70,188 @@ FOCUS = {
                  "合作中标、行业落地动态。",
 }
 
-# ---- 各板块相关性关键词（抓取后硬性过滤，只保留与板块主题高度相关的条目）----
-# 说明：搜索源已扩大（官网 + 权威行业媒体），但媒体源内容驳杂，必须用关键词把关，
-#       杜绝"标题与板块无关 / 随意堆砌"。关键词命中标题或来源名即视为相关。
+# ---- 各板块/区域相关性关键词（抓取后硬性过滤 + 发布前复核）----
+# 规则：对【所有来源】（含厂商官方）一律按标题关键词判定；命中才保留。
 KEYWORDS = {
-    "storage": ["存储", "闪存", "nand", "dram", "hbm", "ssd", "固态", "内存", "晶圆", "颗粒",
-                "铠侠", "西部数据", "sk海力士", "美光", "三星", "长江存储", "长鑫",
-                "集邦", "trendforce", "digitimes", "价格", "涨价", "跌价", "供需", "产能", "库存",
-                "kioxia", "micron", "sk hynix", "samsung", "semiconductor", "nand闪存", "dram内存"],
-    "token": ["大模型", "api", "token", "gpt", "claude", "文心", "通义", "智谱", "glm", "openai",
-              "anthropic", "百度", "阿里", "千帆", "百炼", "gemini", "模型", "推理", "上下文", "费率",
-              "定价", "降价", "免费额度", "调用", "mistral", "meta ai", "xai", "grok", "cohere",
-              "azure", "微软", "谷歌", "模型发布", "多模态", "对话", "智能体", "llm", "chatgpt",
-              "claude", "deepseek", "kimi", "豆包", "大模型api", "模型价格"],
-    "compute_foreign": ["nvidia", "英伟达", "gpu", "amd", "intel", "英特尔", "加速卡", "显卡",
-                        "blackwell", "hopper", "mi300", "数据中心", "ai芯片", "算力", "芯片", "cuda",
-                        "rubin", "superchip", "超级芯片", "datacenter", "accelerator"],
-    "compute_domestic": ["昇腾", "寒武纪", "摩尔线程", "沐曦", "壁仞", "天数智芯", "燧原", "昆仑芯",
-                         "国产", "gpu", "ai芯片", "加速卡", "算力", "芯片", "ascend", "cambricon",
-                         "国产gpu", "国产芯片", "信创"],
+    "storage_foreign": ["samsung", "三星", "sk海力士", "sk hynix", "micron", "美光", "kioxia", "铠侠",
+                        "western digital", "西部数据", "trendforce", "digitimes", "集邦", "nand", "dram",
+                        "hbm", "ssd", "闪存", "内存", "晶圆", "存储", "wafer", "价格", "涨价", "跌价",
+                        "供需", "产能", "库存", "ddr", "3d nand", "semiconductor", "nand闪存", "dram内存"],
+    "storage_domestic": ["长江存储", "长鑫", "兆易创新", "澜起", "武汉新芯", "普冉", "北京君正", "国产存储",
+                         "长江", "长鑫存储", "闪存", "存储芯片", "nand", "dram", "ssd", "存储", "3d nand",
+                         "价格", "涨价", "跌价", "供需", "产能", "库存", "ddr"],
+    "token_foreign": ["openai", "gpt", "chatgpt", "anthropic", "claude", "google", "gemini", "azure", "微软",
+                      "meta ai", "llama", "mistral", "xai", "grok", "cohere", "api", "token", "大模型", "模型",
+                      "推理", "上下文", "费率", "定价", "降价", "免费额度", "调用", "模型发布", "多模态",
+                      "对话", "智能体", "llm", "model", "chatbot", "artificial intelligence"],
+    "token_domestic": ["文心", "通义", "智谱", "glm", "kimi", "deepseek", "豆包", "讯飞", "星火", "百度", "阿里",
+                       "千帆", "百炼", "国产大模型", "大模型", "api", "token", "模型", "推理", "上下文", "费率",
+                       "定价", "降价", "免费额度", "调用", "模型发布", "多模态", "对话", "智能体", "llm"],
+    "compute_foreign": ["nvidia", "英伟达", "amd", "intel", "英特尔", "blackwell", "hopper", "mi300", "mi325",
+                        "rubin", "instinct", "gaudi", "cuda", "datacenter", "superchip", "accelerator",
+                        "h100", "b200", "h200", "a100", "rtx"],
+    "compute_domestic": ["昇腾", "ascend", "寒武纪", "cambricon", "摩尔线程", "mthreads", "沐曦", "metax",
+                         "壁仞", "biren", "天数智芯", "iluvatar", "国产gpu", "国产ai芯片", "信创"],
     "jd": ["政企", "企业业务", "京东云", "京东工业", "中标", "政采", "企业购", "数字化采购", "集采",
-           "京东企业", "京东政企", "jd cloud", "jd industry", "政务云", "企业级", "供应链", "to b", "toB"],
+           "京东企业", "京东政企", "jd cloud", "jd industry", "政务云", "企业级", "供应链", "to b", "tob", "京东"],
 }
 
-# 官方厂商 + 垂直行业媒体：它们只发布本域内容，默认与本板块相关（无需关键词把关）
+def _kname(gid, region):
+    if region in ("foreign", "domestic"):
+        return f"{gid}_{region}"
+    return gid
+
 def _relevant(item, keys):
-    """相关性判定：
-    - 官方厂商 / 垂直行业媒体源（core）：默认相关；
-    - 综合媒体源（36氪/钛媒体/量子位/TechCrunch 等）：必须标题本身含板块关键词，
-      否则视为无关（避免"随意堆砌"与"关联度低"）。
-    """
-    if item.get("source") in CORE_SOURCES:
-        return True
+    """相关性判定：标题（小写）命中任一关键词即相关；空关键词视为相关。
+    注意：所有来源（含厂商官方）都走此判定，不再有 core 豁免。"""
     if not keys:
         return True
     title = (item.get("title", "") or "").lower()
     return any(k.lower() in title for k in keys)
 
-# ---- 数据源：权威官方 Newsroom + 权威行业媒体（机器之心/量子位/36氪/钛媒体/DIGITIMES 等
-#      均为"可抓取的同源权威内容"；严格只取发布日==目标日当天的内容。
-#      说明：微信公众号需登录态+强反爬，云端自动化无法直接抓取，故用其同源官网/RSS 替代。----
+# ---- 数据源：权威官方 Newsroom（official）+ 权威行业媒体（media）
+#  结构：SOURCES[板块][区域] = [源...]；区域为 foreign / domestic / all(京东)
+#  tier=official 表示厂商官网/官方新闻室，tier=media 表示权威行业媒体（公众号同源官网/RSS）。
+#  严格只取发布日==目标日当天的内容。微信公众号需登录态+强反爬，云端无法直接抓取，用同源官网/RSS 替代。
 SOURCES = {
-    "storage": [
-        {"type": "rss", "url": "https://www.trendforce.com/news/feed/", "source": "TrendForce 集邦咨询", "core": True},
-        {"type": "rss", "url": "https://news.skhynix.com/feed/", "source": "SK 海力士", "core": True},
-        {"type": "rss", "url": "https://www.digitimes.com/rss/daily.xml", "source": "DIGITIMES 电子时报（半导体媒体）", "core": True},
-    ],
-    "token": [
-        {"type": "rss", "url": "https://openai.com/news/rss.xml", "source": "OpenAI 官方（GPT）", "core": True},
-        {"type": "html", "url": "https://www.anthropic.com/news", "source": "Anthropic 官方（Claude）", "core": True},
-        {"type": "rss", "url": "https://blog.google/technology/ai/rss/", "source": "Google 官方博客（Gemini）", "core": True},
-        {"type": "rss", "url": "https://azure.microsoft.com/en-us/blog/feed/", "source": "微软 Azure 官方博客", "core": True},
-        {"type": "rss", "url": "https://ai.meta.com/blog/rss/", "source": "Meta AI 官方博客", "core": True},
-        {"type": "rss", "url": "https://mistral.ai/news/rss.xml", "source": "Mistral AI 官方", "core": True},
-        {"type": "rss", "url": "https://x.ai/blog/rss.xml", "source": "xAI 官方（Grok）", "core": True},
-        {"type": "rss", "url": "https://cohere.com/blog/rss.xml", "source": "Cohere 官方", "core": True},
-        {"type": "html", "url": "https://cloud.baidu.com/product/wenxinworkshop", "source": "百度智能云千帆（文心）", "core": True},
-        {"type": "html", "url": "https://bailian.aliyun.com/", "source": "阿里云百炼（通义）", "core": True},
-        {"type": "html", "url": "https://open.bigmodel.cn/", "source": "智谱 AI（GLM）", "core": True},
-        # 权威行业媒体（可抓取、同日过滤；对应公众号同源）
-        {"type": "rss", "url": "https://www.qbitai.com/feed", "source": "量子位（AI 媒体）"},
-        {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）"},
-        {"type": "rss", "url": "https://www.tmtpost.com/rss.xml", "source": "钛媒体（科技媒体）"},
-        {"type": "rss", "url": "https://techcrunch.com/category/artificial-intelligence/feed/", "source": "TechCrunch AI"},
-        {"type": "rss", "url": "https://the-decoder.com/feed/", "source": "The Decoder（AI 媒体）"},
-        {"type": "rss", "url": "https://www.marktechpost.com/feed/", "source": "Marktechpost（AI 媒体）"},
-    ],
-    "compute_foreign": [
-        {"type": "rss", "url": "https://nvidianews.nvidia.com/news/rss", "source": "NVIDIA 英伟达", "vendor": "英伟达 NVIDIA", "region": "foreign", "core": True},
-        {"type": "html", "url": "https://www.amd.com/en/newsroom.html", "source": "AMD 官方", "vendor": "AMD", "region": "foreign", "core": True},
-        {"type": "rss", "url": "https://newsroom.intel.com/feed/", "source": "Intel 英特尔", "vendor": "Intel 英特尔", "region": "foreign", "core": True},
-        # 权威硬件/半导体媒体（尽力而为；超时不影响主流程）
-        {"type": "rss", "url": "https://www.servethehome.com/feed/", "source": "ServeTheHome（硬件媒体）", "region": "foreign", "core": True},
-        {"type": "rss", "url": "https://www.tomshardware.com/feeds/all", "source": "Tom's Hardware（硬件媒体）", "region": "foreign", "core": True},
-    ],
-    "compute_domestic": [
-        {"type": "html", "url": "https://www.hiascend.com/", "source": "华为昇腾", "vendor": "华为昇腾", "region": "domestic", "core": True},
-        {"type": "html", "url": "https://www.cambricon.com/", "source": "寒武纪", "vendor": "寒武纪", "region": "domestic", "core": True},
-        {"type": "html", "url": "https://www.mthreads.com/", "source": "摩尔线程", "vendor": "摩尔线程", "region": "domestic", "core": True},
-        {"type": "html", "url": "https://www.metax-tech.com/", "source": "沐曦股份", "vendor": "沐曦股份", "region": "domestic", "core": True},
-        {"type": "html", "url": "https://www.birentech.com/", "source": "壁仞科技", "vendor": "壁仞科技", "region": "domestic", "core": True},
-        {"type": "html", "url": "https://www.iluvatar.com/", "source": "天数智芯", "vendor": "天数智芯", "region": "domestic", "core": True},
-        {"type": "html", "url": "https://www.enflame-tech.com/", "source": "燧原科技", "vendor": "燧原科技", "region": "domestic", "core": True},
-        {"type": "html", "url": "https://www.kunlunxin.com/", "source": "昆仑芯", "vendor": "昆仑芯", "region": "domestic", "core": True},
-        # 权威半导体媒体（尽力而为；超时不影响主流程）
-        {"type": "rss", "url": "https://www.jiwei.com.cn/rss", "source": "集微网（半导体媒体）", "region": "domestic", "core": True},
-    ],
-    "jd": [
-        {"type": "html", "url": "https://e.jd.com/", "source": "京东企业业务", "core": True},
-        {"type": "html", "url": "https://www.jdcloud.com/", "source": "京东云", "core": True},
-        {"type": "html", "url": "https://news.jd.com/", "source": "京东黑板报（官方资讯）", "core": True},
-        # 权威科技/企业媒体（可抓取、同日过滤、关键词把关；对应公众号同源）
-        {"type": "rss", "url": "https://www.tmtpost.com/rss.xml", "source": "钛媒体（科技媒体）"},
-        {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）"},
-    ],
+    "storage": {
+        "foreign": [
+            {"type": "rss", "url": "https://www.trendforce.com/news/feed/", "source": "TrendForce 集邦咨询", "tier": "official"},
+            {"type": "rss", "url": "https://news.skhynix.com/feed/", "source": "SK 海力士", "tier": "official"},
+            {"type": "rss", "url": "https://www.digitimes.com/rss/daily.xml", "source": "DIGITIMES 电子时报", "tier": "official"},
+            # 权威存储/半导体媒体（官网优先无则取此）
+            {"type": "rss", "url": "https://www.tomshardware.com/feeds/all", "source": "Tom's Hardware（存储/半导体媒体）", "tier": "media"},
+        ],
+        "domestic": [
+            # 国内存储厂商官方站（尽力而为；官网无 RSS 时抓新闻页）
+            {"type": "html", "url": "https://www.ymtc.com/", "source": "长江存储 YMTC", "tier": "official", "vendor": "长江存储"},
+            {"type": "html", "url": "https://www.cxmt.com/", "source": "长鑫存储 CXMT", "tier": "official", "vendor": "长鑫存储"},
+            {"type": "html", "url": "https://www.gigadevice.com/", "source": "兆易创新", "tier": "official", "vendor": "兆易创新"},
+            # 国内半导体/存储媒体
+            {"type": "rss", "url": "https://www.jiwei.com.cn/rss", "source": "集微网（半导体媒体）", "tier": "media"},
+            {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）", "tier": "media"},
+        ],
+    },
+    "token": {
+        "foreign": [
+            {"type": "rss", "url": "https://openai.com/news/rss.xml", "source": "OpenAI 官方（GPT）", "tier": "official"},
+            {"type": "rss", "url": "https://blog.google/technology/ai/rss/", "source": "Google 官方博客（Gemini）", "tier": "official"},
+            {"type": "rss", "url": "https://azure.microsoft.com/en-us/blog/feed/", "source": "微软 Azure 官方博客", "tier": "official"},
+            {"type": "rss", "url": "https://ai.meta.com/blog/rss/", "source": "Meta AI 官方博客", "tier": "official"},
+            {"type": "rss", "url": "https://mistral.ai/news/rss.xml", "source": "Mistral AI 官方", "tier": "official"},
+            {"type": "rss", "url": "https://x.ai/blog/rss.xml", "source": "xAI 官方（Grok）", "tier": "official"},
+            {"type": "rss", "url": "https://cohere.com/blog/rss.xml", "source": "Cohere 官方", "tier": "official"},
+            {"type": "html", "url": "https://www.anthropic.com/news", "source": "Anthropic 官方（Claude）", "tier": "official"},
+            # 权威 AI 媒体（官网优先无则取此）
+            {"type": "rss", "url": "https://techcrunch.com/category/artificial-intelligence/feed/", "source": "TechCrunch AI", "tier": "media"},
+            {"type": "rss", "url": "https://the-decoder.com/feed/", "source": "The Decoder（AI 媒体）", "tier": "media"},
+            {"type": "rss", "url": "https://www.marktechpost.com/feed/", "source": "Marktechpost（AI 媒体）", "tier": "media"},
+        ],
+        "domestic": [
+            # 国内大模型官方站（尽力而为）
+            {"type": "html", "url": "https://cloud.baidu.com/product/wenxinworkshop", "source": "百度智能云千帆（文心）", "tier": "official", "vendor": "百度文心"},
+            {"type": "html", "url": "https://bailian.aliyun.com/", "source": "阿里云百炼（通义）", "tier": "official", "vendor": "阿里通义"},
+            {"type": "html", "url": "https://open.bigmodel.cn/", "source": "智谱 AI（GLM）", "tier": "official", "vendor": "智谱 GLM"},
+            {"type": "html", "url": "https://kimi.moonshot.cn/", "source": "月之暗面 Kimi", "tier": "official", "vendor": "Kimi"},
+            {"type": "html", "url": "https://www.deepseek.com/", "source": "DeepSeek 深度求索", "tier": "official", "vendor": "DeepSeek"},
+            # 权威 AI 媒体（覆盖国产大模型动态）
+            {"type": "rss", "url": "https://www.qbitai.com/feed", "source": "量子位（AI 媒体）", "tier": "media"},
+            {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）", "tier": "media"},
+            {"type": "rss", "url": "https://www.tmtpost.com/rss.xml", "source": "钛媒体（科技媒体）", "tier": "media"},
+        ],
+    },
+    "compute": {
+        "foreign": [
+            {"type": "rss", "url": "https://nvidianews.nvidia.com/news/rss", "source": "NVIDIA 英伟达", "tier": "official", "vendor": "英伟达 NVIDIA"},
+            {"type": "html", "url": "https://www.amd.com/en/newsroom.html", "source": "AMD 官方", "tier": "official", "vendor": "AMD"},
+            {"type": "rss", "url": "https://newsroom.intel.com/feed/", "source": "Intel 英特尔", "tier": "official", "vendor": "Intel 英特尔"},
+            # 权威硬件媒体（官网优先无则取此；仅保留提及 NVIDIA/AMD/Intel 的条目）
+            {"type": "rss", "url": "https://www.servethehome.com/feed/", "source": "ServeTheHome（硬件媒体）", "tier": "media"},
+            {"type": "rss", "url": "https://www.tomshardware.com/feeds/all", "source": "Tom's Hardware（硬件媒体）", "tier": "media"},
+        ],
+        "domestic": [
+            {"type": "html", "url": "https://www.hiascend.com/", "source": "华为昇腾", "tier": "official", "vendor": "华为昇腾"},
+            {"type": "html", "url": "https://www.cambricon.com/", "source": "寒武纪", "tier": "official", "vendor": "寒武纪"},
+            {"type": "html", "url": "https://www.mthreads.com/", "source": "摩尔线程", "tier": "official", "vendor": "摩尔线程"},
+            {"type": "html", "url": "https://www.metax-tech.com/", "source": "沐曦股份", "tier": "official", "vendor": "沐曦股份"},
+            {"type": "html", "url": "https://www.birentech.com/", "source": "壁仞科技", "tier": "official", "vendor": "壁仞科技"},
+            {"type": "html", "url": "https://www.iluvatar.com/", "source": "天数智芯", "tier": "official", "vendor": "天数智芯"},
+            # 国内半导体媒体（仅保留上述 6 家国产 AI 芯片厂商相关条目）
+            {"type": "rss", "url": "https://www.jiwei.com.cn/rss", "source": "集微网（半导体媒体）", "tier": "media"},
+        ],
+    },
+    "jd": {
+        "all": [
+            {"type": "html", "url": "https://e.jd.com/", "source": "京东企业业务", "tier": "official"},
+            {"type": "html", "url": "https://www.jdcloud.com/", "source": "京东云", "tier": "official"},
+            {"type": "html", "url": "https://news.jd.com/", "source": "京东黑板报（官方资讯）", "tier": "official"},
+            # 权威科技/企业媒体（官网优先无则取此）
+            {"type": "rss", "url": "https://www.tmtpost.com/rss.xml", "source": "钛媒体（科技媒体）", "tier": "media"},
+            {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）", "tier": "media"},
+        ],
+    },
 }
-# 官方厂商 + 垂直行业媒体源（core）：默认与本板块相关，不参与关键词过滤
-CORE_SOURCES = {src["source"] for grp in SOURCES.values() for src in grp if src.get("core")}
 
-# ---- 官方关注渠道（某板块当日无更新时展示，供用户自行关注；均为权威官方站点）----
+# ---- 官方关注渠道（某板块/区域当日无更新时展示，供用户自行关注；均为权威官方站点）----
 CHANNELS = {
-    "storage": [
-        {"name": "TrendForce 集邦咨询", "url": "https://www.trendforce.com/news/"},
-        {"name": "DRAMeXchange", "url": "https://www.dramexchange.com/"},
-        {"name": "三星 Samsung Newsroom", "url": "https://news.samsung.com/global/"},
-        {"name": "SK 海力士", "url": "https://news.skhynix.com/"},
-        {"name": "美光 Micron", "url": "https://www.micron.com/about/newsroom"},
-        {"name": "西部数据 Western Digital", "url": "https://blog.westerndigital.com/"},
-        {"name": "铠侠 Kioxia", "url": "https://www.kioxia.com/en-us/"},
-    ],
-    "token": [
-        {"name": "OpenAI 官方（GPT）", "url": "https://openai.com/news"},
-        {"name": "Anthropic 官方（Claude）", "url": "https://www.anthropic.com/news"},
-        {"name": "Google 官方博客（Gemini）", "url": "https://blog.google/technology/ai/"},
-        {"name": "微软 Azure 官方博客", "url": "https://azure.microsoft.com/en-us/blog/"},
-        {"name": "Meta AI 官方博客", "url": "https://ai.meta.com/blog/"},
-        {"name": "Mistral AI 官方", "url": "https://mistral.ai/news"},
-        {"name": "xAI 官方（Grok）", "url": "https://x.ai/blog"},
-        {"name": "Cohere 官方", "url": "https://cohere.com/blog"},
-        {"name": "百度智能云千帆（文心）", "url": "https://cloud.baidu.com/product/wenxinworkshop"},
-        {"name": "阿里云百炼（通义）", "url": "https://bailian.aliyun.com/"},
-        {"name": "智谱 AI（GLM）", "url": "https://open.bigmodel.cn/"},
-    ],
-    "compute_foreign": [
-        {"name": "NVIDIA 英伟达", "url": "https://nvidianews.nvidia.com/"},
-        {"name": "AMD 官方", "url": "https://www.amd.com/en/newsroom.html"},
-        {"name": "Intel 英特尔", "url": "https://newsroom.intel.com/"},
-    ],
-    "compute_domestic": [
-        {"name": "华为昇腾", "url": "https://www.hiascend.com/"},
-        {"name": "寒武纪", "url": "https://www.cambricon.com/"},
-        {"name": "摩尔线程", "url": "https://www.mthreads.com/"},
-        {"name": "沐曦股份", "url": "https://www.metax-tech.com/"},
-        {"name": "壁仞科技", "url": "https://www.birentech.com/"},
-        {"name": "天数智芯", "url": "https://www.iluvatar.com/"},
-        {"name": "燧原科技", "url": "https://www.enflame-tech.com/"},
-        {"name": "昆仑芯", "url": "https://www.kunlunxin.com/"},
-    ],
+    "storage": {
+        "foreign": [
+            {"name": "三星 Samsung Newsroom", "url": "https://news.samsung.com/global/", "region": "foreign"},
+            {"name": "SK 海力士", "url": "https://news.skhynix.com/", "region": "foreign"},
+            {"name": "美光 Micron", "url": "https://www.micron.com/about/newsroom", "region": "foreign"},
+            {"name": "西部数据 Western Digital", "url": "https://blog.westerndigital.com/", "region": "foreign"},
+            {"name": "铠侠 Kioxia", "url": "https://www.kioxia.com/en-us/", "region": "foreign"},
+            {"name": "TrendForce 集邦咨询", "url": "https://www.trendforce.com/news/", "region": "foreign"},
+        ],
+        "domestic": [
+            {"name": "长江存储 YMTC", "url": "https://www.ymtc.com/", "region": "domestic"},
+            {"name": "长鑫存储 CXMT", "url": "https://www.cxmt.com/", "region": "domestic"},
+            {"name": "兆易创新", "url": "https://www.gigadevice.com/", "region": "domestic"},
+            {"name": "澜起科技", "url": "https://www.montage-tech.com/", "region": "domestic"},
+        ],
+    },
+    "token": {
+        "foreign": [
+            {"name": "OpenAI 官方（GPT）", "url": "https://openai.com/news", "region": "foreign"},
+            {"name": "Anthropic 官方（Claude）", "url": "https://www.anthropic.com/news", "region": "foreign"},
+            {"name": "Google 官方博客（Gemini）", "url": "https://blog.google/technology/ai/", "region": "foreign"},
+            {"name": "微软 Azure 官方博客", "url": "https://azure.microsoft.com/en-us/blog/", "region": "foreign"},
+            {"name": "Meta AI 官方博客", "url": "https://ai.meta.com/blog/", "region": "foreign"},
+            {"name": "Mistral AI 官方", "url": "https://mistral.ai/news", "region": "foreign"},
+            {"name": "xAI 官方（Grok）", "url": "https://x.ai/blog", "region": "foreign"},
+            {"name": "Cohere 官方", "url": "https://cohere.com/blog", "region": "foreign"},
+        ],
+        "domestic": [
+            {"name": "百度智能云千帆（文心）", "url": "https://cloud.baidu.com/product/wenxinworkshop", "region": "domestic"},
+            {"name": "阿里云百炼（通义）", "url": "https://bailian.aliyun.com/", "region": "domestic"},
+            {"name": "智谱 AI（GLM）", "url": "https://open.bigmodel.cn/", "region": "domestic"},
+            {"name": "月之暗面 Kimi", "url": "https://kimi.moonshot.cn/", "region": "domestic"},
+            {"name": "DeepSeek 深度求索", "url": "https://www.deepseek.com/", "region": "domestic"},
+            {"name": "讯飞星火", "url": "https://xinghuo.xfyun.cn/", "region": "domestic"},
+        ],
+    },
+    "compute": {
+        "foreign": [
+            {"name": "NVIDIA 英伟达", "url": "https://nvidianews.nvidia.com/", "region": "foreign"},
+            {"name": "AMD 官方", "url": "https://www.amd.com/en/newsroom.html", "region": "foreign"},
+            {"name": "Intel 英特尔", "url": "https://newsroom.intel.com/", "region": "foreign"},
+        ],
+        "domestic": [
+            {"name": "华为昇腾", "url": "https://www.hiascend.com/", "region": "domestic"},
+            {"name": "寒武纪", "url": "https://www.cambricon.com/", "region": "domestic"},
+            {"name": "摩尔线程", "url": "https://www.mthreads.com/", "region": "domestic"},
+            {"name": "沐曦股份", "url": "https://www.metax-tech.com/", "region": "domestic"},
+            {"name": "壁仞科技", "url": "https://www.birentech.com/", "region": "domestic"},
+            {"name": "天数智芯", "url": "https://www.iluvatar.com/", "region": "domestic"},
+        ],
+    },
     "jd": [
-        {"name": "京东企业业务", "url": "https://e.jd.com/"},
-        {"name": "京东云", "url": "https://www.jdcloud.com/"},
-        {"name": "京东", "url": "https://www.jd.com/"},
-        {"name": "京东黑板报（官方资讯）", "url": "https://news.jd.com/"},
-        {"name": "京东物流", "url": "https://www.jdl.com/"},
-        {"name": "京东工业", "url": "https://www.jd.com/"},
+        {"name": "京东企业业务", "url": "https://e.jd.com/", "region": ""},
+        {"name": "京东云", "url": "https://www.jdcloud.com/", "region": ""},
+        {"name": "京东", "url": "https://www.jd.com/", "region": ""},
+        {"name": "京东黑板报（官方资讯）", "url": "https://news.jd.com/", "region": ""},
+        {"name": "京东物流", "url": "https://www.jdl.com/", "region": ""},
+        {"name": "京东工业", "url": "https://www.jd.com/", "region": ""},
     ],
 }
 
@@ -216,6 +263,7 @@ SECTION_NAMES = {
     "storage": "存储市场", "token": "Token 市场",
     "compute": "算力市场", "jd": "京东政企",
 }
+REGION_LABELS = [("foreign", "国外"), ("domestic", "国内")]
 DATE_RES = [
     re.compile(r"(\d{4})[-/年.](\d{1,2})[-/月.](\d{1,2})"),
     re.compile(r"(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日"),
@@ -327,27 +375,47 @@ def fetch_html(src, limit=12):
         print(f"  [HTML失败] {src['source']}: {ex}")
         return []
 
-def collect(group):
-    items = []
-    for src in SOURCES[group]:
-        got = fetch_rss(src) if src["type"] == "rss" else fetch_html(src)
-        for it in got:
-            it.setdefault("vendor", src.get("vendor", ""))
-            it.setdefault("region", src.get("region", ""))
-            items.append(it)
-        print(f"  {src['source']}: 抓到 {len(got)} 条（仅 {BIZ_STR} 发布）")
+def _relevance_filter(items, keys):
+    if not keys:
+        return items
+    before = len(items)
+    kept = [it for it in items if _relevant(it, keys)]
+    print(f"    相关性过滤：{before} -> {len(kept)} 条")
+    return kept
+
+def _dedupe(items):
     uniq, seen = [], set()
     for it in items:
         if it["url"] in seen:
             continue
         seen.add(it["url"]); uniq.append(it)
-    # 相关性过滤：只保留与本板块主题高度相关的条目（硬性要求，避免无关内容堆砌）
-    keys = KEYWORDS.get(group, [])
-    if keys:
-        before = len(uniq)
-        uniq = [it for it in uniq if _relevant(it, keys)]
-        print(f"  相关性过滤：{before} -> {len(uniq)} 条（仅保留与「{SECTION_NAMES.get(group, group)}」相关）")
-    return uniq[:15]
+    return uniq
+
+def collect_region(section, region):
+    """抓取某板块某区域：官网(official)优先；若官方当日无相关条目，再从媒体(media)取。
+    所有来源均按本区域关键词把关（无关内容剔除）。"""
+    srcs = SOURCES[section][region]
+    keys = KEYWORDS[_kname(section, region)]
+    off, med = [], []
+    for src in srcs:
+        got = fetch_rss(src) if src["type"] == "rss" else fetch_html(src)
+        for it in got:
+            it.setdefault("vendor", src.get("vendor", ""))
+            it["region"] = "" if region == "all" else region
+            it["_tier"] = src.get("tier", "media")
+            (off if src.get("tier") == "official" else med).append(it)
+        print(f"  [{section}/{region}] {src['source']}: 抓到 {len(got)} 条（仅 {BIZ_STR} 发布）")
+    off = _dedupe(_relevance_filter(off, keys))
+    med = _dedupe(_relevance_filter(med, keys))
+    # 官网优先；官方无则媒体兜底
+    chosen = off if off else med
+    print(f"  [{section}/{region}] 采用：{'官方(官网优先)' if off else ('媒体兜底' if med else '无')} 共 {len(chosen)} 条")
+    return chosen[:12]
+
+def collect_section(section):
+    if section == "jd":
+        return {"all": collect_region("jd", "all")}
+    return {r: collect_region(section, r) for r, _ in REGION_LABELS}
 
 # ---------- 发布前链接可达性自检 ----------
 _url_cache = {}
@@ -385,9 +453,58 @@ def filter_dead_links(items):
         print(f"  [链接自检] 剔除 {len(dropped)} 条不可访问链接: {dropped[:3]}")
     return kept
 
-# ---------- 调用 LLM（主+兜底）----------
+# ---------- 中文翻译安全网（对付免费模型英文残留）----------
+def _has_cjk(s):
+    return any('\u4e00' <= ch <= '\u9fff' for ch in (s or ""))
+
+def _need_cn(s):
+    s = (s or "").strip()
+    if not s:
+        return False
+    return not _has_cjk(s)
+
+def _translate_batch(pairs):
+    """pairs: [(idx, title, excerpt), ...]；返回 {idx: (title, excerpt)} 中文版。"""
+    if not pairs:
+        return {}
+    payload = [{"idx": i, "title": t, "excerpt": e} for i, t, e in pairs]
+    system = ("你是将英文科技资讯翻译为书面化简体中文的翻译专家。专有名词保留英文并附中文"
+              "（如 'NVIDIA 英伟达'、'GPT-5'）。只输出 JSON："
+              '{"items":[{"idx":0,"title":"中文标题","excerpt":"中文摘要"}]}，不要任何解释。')
+    user = "请将以下条目翻译为简体中文：\n" + json.dumps(payload, ensure_ascii=False, indent=2)
+    try:
+        txt = call_llm(system, user, temperature=0.2)
+        d = json.loads(txt)
+        out = {}
+        for g in (d.get("items") or []):
+            try:
+                idx = int(g.get("idx"))
+            except Exception:
+                continue
+            out[idx] = (g.get("title", ""), g.get("excerpt", ""))
+        return out
+    except Exception as ex:
+        print(f"  [翻译失败] {ex}")
+        return {}
+
+def _translate_text(text):
+    if not _need_cn(text):
+        return text
+    system = "你是将英文科技资讯翻译为书面化简体中文的翻译专家。专有名词保留英文并附中文。只输出翻译结果，不要解释。"
+    try:
+        return call_llm(system, "翻译：\n" + text, temperature=0.2).strip().strip('"').strip()
+    except Exception as ex:
+        print(f"  [摘要翻译失败] {ex}")
+        return text
+
+# ---------- 调用 LLM（主+兜底，按能力从强到弱）----------
 def call_llm(system, user, temperature=0.3):
-    providers = [p for p in (PRIMARY, FALLBACK) if p[1]]
+    providers = []
+    if PRIMARY[1]:
+        providers.append(PRIMARY)
+    for fb in FALLBACKS:
+        if fb[1]:
+            providers.append(fb)
     last_err = None
     for url, key, model in providers:
         try:
@@ -402,7 +519,7 @@ def call_llm(system, user, temperature=0.3):
             return resp.json()["choices"][0]["message"]["content"]
         except Exception as ex:
             last_err = ex
-            print(f"  [LLM 供应商失败 {url[:45]}]: {ex}")
+            print(f"  [LLM 供应商失败 {url[:45]} / {model}]: {ex}")
     raise RuntimeError(f"所有 LLM 供应商均失败: {last_err}")
 
 def synthesize(section_label, items, channels=None):
@@ -419,7 +536,8 @@ def synthesize(section_label, items, channels=None):
     payload = [{"idx": it["_idx"], "title": it["title"], "source": it["source"], "url": it["url"]} for it in items]
     system = ("你是中国市场动态看板的资深分析师，面向不懂技术的小白用户。"
               "要求：1）书面化但不口语化；2）无门槛可读；3）严格基于提供的官方条目，不得编造；"
-              "4）所有输出必须是简体中文（英文标题/专有名词需翻译为中文，厂商名可保留英文+中文，如 'NVIDIA 英伟达'）；"
+              "4）【所有输出必须是简体中文】——英文标题/要点必须翻译为中文，厂商名保留英文并附中文"
+              "（如 'NVIDIA 英伟达'、'GPT-5'）；绝不可保留英文原标题；"
               "5）url 与 source 仅作参考，最终以输入为准，不得改动或新增链接；"
               "6）必须按 idx 一一对应返回，不得增删、不得调换顺序。")
     user = (f"以下是「{section_label}」在 {BIZ_STR} 当天发布的官方动态条目（均为当天发布、附真实官方链接），每条带 idx：\n"
@@ -430,7 +548,7 @@ def synthesize(section_label, items, channels=None):
             "务必只保留你决定留下的条目的 idx。\n"
             "2）提炼：对保留的每条，用书面化中文写 2-3 句要点（面向小白、可读）。\n"
             "严格要求：\n"
-            "- 返回的每个对象必须含 idx 字段，且 idx 与输入某条完全一致；title 字段【必须是简体中文标题】。\n"
+            "- 返回的每个对象必须含 idx 字段，且 idx 与输入某条完全一致；title 字段【必须是简体中文标题】（不得是英文原标题）。\n"
             "- excerpt 字段为 2-3 句书面化中文重点摘要。\n"
             "输出 JSON：\n"
             "{\n"
@@ -468,15 +586,38 @@ def synthesize(section_label, items, channels=None):
             out_items = [{"title": it["title"], "source": it["source"], "url": it["url"],
                           "excerpt": "", "vendor": it.get("vendor", ""), "region": it.get("region", "")} for it in items]
             summary = summary or f"{section_label}当日获取到 {len(items)} 条官方动态，详见各条官方来源。"
+        # ---- 中文翻译安全网：标题/摘要无中文则翻译 ----
+        to_trans = [(i, it.get("title", ""), it.get("excerpt", "")) for i, it in enumerate(out_items)
+                    if _need_cn(it.get("title", "")) or _need_cn(it.get("excerpt", ""))]
+        if to_trans:
+            tr = _translate_batch(to_trans)
+            for i, _, _ in to_trans:
+                if i in tr:
+                    t, e = tr[i]
+                    if t:
+                        out_items[i]["title"] = t
+                    if e:
+                        out_items[i]["excerpt"] = e
+        if _need_cn(summary):
+            summary = _translate_text(summary)
+        for it in out_items:
+            it.pop("_idx", None)
         return {"summary": summary, "items": out_items, "channels": channels or []}
     except Exception as ex:
         print(f"  [LLM失败 {section_label}]: {ex}")
+        # 兜底：保留原始条目并尽力翻译标题
+        out_items = []
+        for it in items:
+            it.pop("_idx", None)
+            title = it["title"]
+            if _need_cn(title):
+                title = _translate_text(title) or title
+            out_items.append({"title": title, "source": it["source"], "url": it["url"],
+                              "excerpt": "（摘要生成暂不可用，请点击来源查看官方原文）",
+                              "vendor": it.get("vendor", ""), "region": it.get("region", "")})
         return {
             "summary": f"{section_label}当日获取到 {len(items)} 条官方动态，摘要生成异常，已沿用原始标题，详见各条官方来源。",
-            "items": [{"title": it["title"], "source": it["source"], "url": it["url"],
-                       "excerpt": "（摘要生成暂不可用，请点击来源查看官方原文）",
-                       "vendor": it.get("vendor", ""), "region": it.get("region", "")} for it in items],
-            "channels": channels or [],
+            "items": out_items, "channels": channels or [],
         }
 
 # ---------- 周/月总结 ----------
@@ -497,14 +638,12 @@ def build_review(data):
     review = next((s for s in data["sections"] if s.get("type") == "review"), None)
     if not review:
         return
-    # 周总结：目标日期为周日时生成，覆盖当周一到周日（即目标日期）
     if BIZ_DATE.weekday() == 6:
         end = BIZ_DATE
         start = end - datetime.timedelta(days=6)
         sums = period_summaries(data, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
         if sums:
             review["weekly"] = {"period": f"{start} 至 {end}", "summary": synthesize_review("周", start, end, sums)}
-    # 月总结：目标日期为当月最后一天时生成，覆盖当月
     if is_last_day(BIZ_DATE):
         start = BIZ_DATE.replace(day=1)
         sums = period_summaries(data, start.strftime("%Y-%m-%d"), BIZ_DATE.strftime("%Y-%m-%d"))
@@ -525,19 +664,12 @@ def synthesize_review(kind, start, end, sums):
 
 # ---------- 发布前统一自检（沿用此前所有硬性规则 + 本次相关性/链接一致性）----------
 def verify_before_publish(data):
-    """写回 index.html 前最后一道关：逐项核查，不达标一律剔除并告警。
-    检查项：① 日期==目标日（当日，无陈旧）；② 链接可达（无死链）；
-           ③ 与板块主题相关（无关内容剔除）；④ 标题-链接一致（url 合法、来自抓取源）。
-    """
     print("== 发布前自检：当日 / 死链 / 相关性 / 链接一致性 ==")
     for sec in data["sections"]:
         if sec.get("type") == "review":
             continue
         gid = sec["id"]
         for d, entry in (sec.get("dates") or {}).items():
-            # ① 日期必须为当日（历史回填的其它日期不动，这里只校验本次目标日）
-            if d == BIZ_STR:
-                pass
             kept = []
             for it in (entry.get("items") or []):
                 url = it.get("url", "")
@@ -550,11 +682,9 @@ def verify_before_publish(data):
                 if not check_url(url):
                     print(f"  [自检-死链] {sec['name']}/{d} 剔除: {url}")
                     continue
-                # ③ 相关性复核（算力按 region 区分国内外关键词）
-                if gid == "compute":
-                    kset = KEYWORDS["compute_foreign"] if it.get("region") == "foreign" else KEYWORDS["compute_domestic"]
-                else:
-                    kset = KEYWORDS.get(gid)
+                # ③ 相关性复核（按区域关键词）
+                region = it.get("region", "")
+                kset = KEYWORDS.get(_kname(gid, region)) or KEYWORDS.get(gid)
                 if kset and not _relevant(it, kset):
                     print(f"  [自检-关联度低] {sec['name']}/{d} 剔除: {title[:24]}")
                     continue
@@ -577,36 +707,50 @@ def main():
 
     print(f"== 目标更新日期（北京时间 24:00 运行）：{BIZ_STR} ==")
 
-    # 存储 / Token / 京东
-    for key in ["storage", "token", "jd"]:
-        print(f"-- 抓取 {SECTION_NAMES[key]} --")
-        items = collect(key)
-        items = filter_dead_links(items)          # 发布前链接自检
-        channels = CHANNELS.get(key, [])
-        res = synthesize(SECTION_NAMES[key], items, channels)
-        data = ensure_date(data, key, BIZ_STR, res)
-    # 算力（国外 + 国内）
-    print("-- 抓取 算力市场（国外/国内）--")
-    f_items = collect("compute_foreign")
-    d_items = collect("compute_domestic")
-    f_items = filter_dead_links(f_items)
-    d_items = filter_dead_links(d_items)
-    print(f"  国外 {len(f_items)} 条 / 国内 {len(d_items)} 条")
-    f_res = synthesize("算力市场·国外厂商", f_items, CHANNELS["compute_foreign"])
-    d_res = synthesize("算力市场·国内厂商", d_items, CHANNELS["compute_domestic"])
-    comp_items = f_res["items"] + d_res["items"]
-    comp_summary = ("国外厂商：" + f_res["summary"] + "\n国内厂商：" + d_res["summary"]) if (f_items or d_items) else \
-                  f"今日（{BIZ_STR}）未检索到算力市场的官方更新，可点击各厂商官方渠道持续关注。"
-    compute_sec = next(s for s in data["sections"] if s["id"] == "compute")
-    compute_sec.setdefault("dates", {})[BIZ_STR] = {"summary": comp_summary, "items": comp_items,
-                                                    "channels": CHANNELS["compute_foreign"] + CHANNELS["compute_domestic"]}
+    # 存储 / Token / 算力：分 国外 / 国内 两组
+    for key in ["storage", "token", "compute"]:
+        name = SECTION_NAMES[key]
+        print(f"-- 抓取 {name}（国外/国内）--")
+        sec_items, summaries = [], []
+        for region, rlabel in REGION_LABELS:
+            raw = collect_region(key, region)
+            raw = filter_dead_links(raw)
+            label_full = f"{name}·{rlabel}"
+            channels = CHANNELS[key].get(region, [])
+            res = synthesize(label_full, raw, channels)
+            for it in res["items"]:
+                it["region"] = region
+            sec_items += res["items"]
+            if res["items"]:
+                summaries.append(f"{rlabel}：{res['summary']}")
+        combined = "\n".join(summaries) if summaries else \
+            f"今日（{BIZ_STR}）未检索到「{name}」的官方更新，可点击下方官方渠道持续关注。"
+        sec_obj = next(s for s in data["sections"] if s["id"] == key)
+        sec_obj.setdefault("dates", {})[BIZ_STR] = {
+            "summary": combined,
+            "items": sec_items,
+            "channels": CHANNELS[key]["foreign"] + CHANNELS[key]["domestic"],
+        }
 
-    # 写入各板块的官方关注渠道（当日无更新时展示，供用户自行关注）
+    # 京东政企（单一区域）
+    print("-- 抓取 京东政企 --")
+    jd_raw = collect_region("jd", "all")
+    jd_raw = filter_dead_links(jd_raw)
+    jd_res = synthesize(SECTION_NAMES["jd"], jd_raw, CHANNELS["jd"])
+    jd_obj = next(s for s in data["sections"] if s["id"] == "jd")
+    jd_obj.setdefault("dates", {})[BIZ_STR] = {
+        "summary": jd_res["summary"], "items": jd_res["items"], "channels": CHANNELS["jd"]
+    }
+
+    # 写入各板块的官方关注渠道（无更新时展示，供用户自行关注）
     for sec in data["sections"]:
         if sec.get("type") == "review":
             continue
         cid = sec["id"]
-        sec["channels"] = (CHANNELS["compute_foreign"] + CHANNELS["compute_domestic"]) if cid == "compute" else CHANNELS.get(cid, [])
+        if cid == "jd":
+            sec["channels"] = CHANNELS["jd"]
+        else:
+            sec["channels"] = CHANNELS[cid]["foreign"] + CHANNELS[cid]["domestic"]
 
     # 周/月总结
     build_review(data)
@@ -629,11 +773,6 @@ def main():
     new_html = html[:m.start(2)] + new_block + html[m.end(2):]
     open(INDEX, "w", encoding="utf-8").write(new_html)
     print("== 已写回 index.html ==")
-
-def ensure_date(data, key, date_str, res):
-    sec = next(s for s in data["sections"] if s["id"] == key)
-    sec.setdefault("dates", {})[date_str] = res   # res 已含 summary/items/channels
-    return data
 
 if __name__ == "__main__":
     main()
