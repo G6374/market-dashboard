@@ -122,7 +122,8 @@
   .exp-btn{font:inherit; padding:7px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; color:#2563eb; cursor:pointer; font-weight:600; margin-left:8px;}
   .exp-btn:hover{background:#eff6ff;}
   @media print{
-    .toolbar,.gloss-btn,.modal{display:none !important;}
+    .toolbar,.gloss-btn,.modal,.tabs{display:none !important;}
+    .page{display:block !important;}
     body{background:#fff;}
     .card,.review-wrap,.price-wrap{box-shadow:none; border-color:#d1d5db;}
     .wrap{padding:0;}
@@ -143,6 +144,16 @@
   .flat{color:var(--muted);}
   .brand-group-label{font-size:13px; font-weight:700; color:#475569; margin:14px 0 6px; border-left:3px solid var(--accent,#ea580c); padding-left:8px;}
   .spark{display:block;}
+  /* 顶部三页导航 */
+  .tabs{display:flex; gap:4px; margin-top:20px; border-bottom:2px solid var(--line); flex-wrap:wrap;}
+  .tab{
+    font:inherit; border:none; background:none; cursor:pointer;
+    padding:10px 18px 12px; font-size:15px; font-weight:600; color:var(--muted);
+    border-bottom:3px solid transparent; margin-bottom:-2px; letter-spacing:.5px;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#2563eb; border-bottom-color:#2563eb;}
+  .page.hidden{display:none;}
 </style>
 </head>
 <body>
@@ -155,19 +166,30 @@
     <span class="proto-badge" id="protoBadge">设计原型 · 示例数据</span>
   </header>
 
-  <div class="toolbar">
-    <label for="dateSel">更新日期</label>
-    <select id="dateSel"></select>
-    <div class="updated">数据更新于：<b id="updatedAt">—</b></div>
-    <button id="btnHtml" class="exp-btn">导出 HTML</button>
-    <button id="btnPdf" class="exp-btn">导出 PDF</button>
-  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-page="news" type="button">市场动态</button>
+    <button class="tab" data-page="price" type="button">存储价格变动</button>
+    <button class="tab" data-page="review" type="button">总结</button>
+  </nav>
 
-  <div class="grid" id="grid"></div>
+  <section class="page" id="pageNews">
+    <div class="toolbar">
+      <label for="dateSel">更新日期</label>
+      <select id="dateSel"></select>
+      <div class="updated">数据更新于：<b id="updatedAt">—</b></div>
+      <button id="btnHtml" class="exp-btn">导出 HTML</button>
+      <button id="btnPdf" class="exp-btn">导出 PDF</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
 
-  <div class="review-wrap" id="reviewPanel"></div>
+  <section class="page hidden" id="pagePrice">
+    <div class="price-wrap" id="pricePanel"></div>
+  </section>
 
-  <div class="price-wrap" id="pricePanel"></div>
+  <section class="page hidden" id="pageReview">
+    <div class="review-wrap" id="reviewPanel"></div>
+  </section>
 
   <footer id="footer"></footer>
 </div>
@@ -1565,8 +1587,25 @@
     sel.innerHTML = dates.map(d=>'<option value="'+d+'">'+d+'</option>').join('') || '<option>暂无数据</option>';
 
     document.getElementById('footer').textContent =
+      '数据更新于 ' + (DATA.meta.updatedAt || '—') + ' · ' +
       (DATA.meta.isPrototype ? DATA.meta.prototypeNote + ' · ' : '') +
       '本看板所有动态均可点击“查看来源”跳转至官方权威网站。每日北京时间 24:00 更新（仅收录当日发布的资讯）；周总结每周日 24:00 生成，月总结每月最后一天 24:00 生成；历史保留 30 天。';
+
+    // 三页导航：切换 + hash 记忆（刷新/分享链接停留在原页）
+    const pageMap = {news:'pageNews', price:'pagePrice', review:'pageReview'};
+    function showTab(name){
+      Object.keys(pageMap).forEach(k=>{
+        document.getElementById(pageMap[k]).classList.toggle('hidden', k!==name);
+        const btn = document.querySelector('.tab[data-page="'+k+'"]');
+        if(btn) btn.classList.toggle('active', k===name);
+      });
+      if(location.hash !== '#'+name) history.replaceState(null, '', '#'+name);
+    }
+    document.querySelectorAll('.tab').forEach(b=>{
+      b.addEventListener('click', ()=>showTab(b.dataset.page));
+    });
+    const initial = (location.hash||'').replace('#','');
+    showTab(pageMap[initial] ? initial : 'news');
 
     sel.onchange = ()=>renderGrid(sel.value);
     renderGrid(dates[0]);
@@ -1656,7 +1695,10 @@
   function renderReview(){
     const sec = (DATA.sections||[]).find(s=>s.type==='review');
     const panel = document.getElementById('reviewPanel');
-    if(!sec){ panel.innerHTML=''; return; }
+    if(!sec){
+      panel.innerHTML = '<div class="empty">暂无总结内容。周总结于每周日 24:00 随当日更新自动生成，月总结于每月最后一天 24:00 自动生成，届时在此页展示。</div>';
+      return;
+    }
     const w = sec.weekly||{}, m = sec.monthly||{};
     panel.innerHTML =
       '<div class="review-head"><span class="dot" style="background:'+sec.accent+'"></span>'+
@@ -1699,7 +1741,12 @@
   function renderPrice(){
     const pm = DATA.priceModule;
     const panel = document.getElementById('pricePanel');
-    if(!pm || !pm.items || !pm.items.length){ panel.style.display='none'; return; }
+    if(!pm || !pm.items || !pm.items.length){
+      panel.style.display='';
+      panel.innerHTML = '<div class="price-head"><h2>'+escapeHtml((pm&&pm.title)||'存储价格变动')+'</h2></div>'+
+        '<div class="empty">暂无价格数据。价格表每周四随最新 xlsx 数据更新，届时在此页展示。</div>';
+      return;
+    }
     panel.style.display='';
     const weeks = pm.weeks||[];
     const latest = weeks.length?weeks[weeks.length-1]:'';
@@ -1751,6 +1798,8 @@
     const clone = document.querySelector('.wrap').cloneNode(true);
     const tb = clone.querySelector('.toolbar'); if(tb) tb.remove();
     const gb = clone.querySelector('.gloss-btn'); if(gb) gb.remove();
+    const nv = clone.querySelector('.tabs'); if(nv) nv.remove();          // 导出为单页全量：去掉导航
+    clone.querySelectorAll('.page').forEach(p=>p.classList.remove('hidden')); // 三页内容全部展开
     const css = Array.from(document.querySelectorAll('style')).map(s=>s.textContent).join('\n');
     const doc = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>'+escapeHtml(DATA.meta.title)+'</title><style>'+css+'</style></head><body>'+clone.outerHTML+'</body></html>';
     const blob = new Blob([doc], {type:'text/html;charset=utf-8'});
