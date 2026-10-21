@@ -84,34 +84,41 @@ KEYWORDS = {
            "京东企业", "京东政企", "jd cloud", "jd industry", "政务云", "企业级", "供应链", "to b", "toB"],
 }
 
+# 官方厂商 + 垂直行业媒体：它们只发布本域内容，默认与本板块相关（无需关键词把关）
 def _relevant(item, keys):
-    """条目标题或来源名命中任一关键词即视为与本板块相关。"""
+    """相关性判定：
+    - 官方厂商 / 垂直行业媒体源（core）：默认相关；
+    - 综合媒体源（36氪/钛媒体/量子位/TechCrunch 等）：必须标题本身含板块关键词，
+      否则视为无关（避免"随意堆砌"与"关联度低"）。
+    """
+    if item.get("source") in CORE_SOURCES:
+        return True
     if not keys:
         return True
-    text = ((item.get("title", "") or "") + " " + (item.get("source", "") or "")).lower()
-    return any(k.lower() in text for k in keys)
+    title = (item.get("title", "") or "").lower()
+    return any(k.lower() in title for k in keys)
 
 # ---- 数据源：权威官方 Newsroom + 权威行业媒体（机器之心/量子位/36氪/钛媒体/DIGITIMES 等
 #      均为"可抓取的同源权威内容"；严格只取发布日==目标日当天的内容。
 #      说明：微信公众号需登录态+强反爬，云端自动化无法直接抓取，故用其同源官网/RSS 替代。----
 SOURCES = {
     "storage": [
-        {"type": "rss", "url": "https://www.trendforce.com/news/feed/", "source": "TrendForce 集邦咨询"},
-        {"type": "rss", "url": "https://news.skhynix.com/feed/", "source": "SK 海力士"},
-        {"type": "rss", "url": "https://www.digitimes.com/rss/daily.xml", "source": "DIGITIMES 电子时报（半导体媒体）"},
+        {"type": "rss", "url": "https://www.trendforce.com/news/feed/", "source": "TrendForce 集邦咨询", "core": True},
+        {"type": "rss", "url": "https://news.skhynix.com/feed/", "source": "SK 海力士", "core": True},
+        {"type": "rss", "url": "https://www.digitimes.com/rss/daily.xml", "source": "DIGITIMES 电子时报（半导体媒体）", "core": True},
     ],
     "token": [
-        {"type": "rss", "url": "https://openai.com/news/rss.xml", "source": "OpenAI 官方（GPT）"},
-        {"type": "html", "url": "https://www.anthropic.com/news", "source": "Anthropic 官方（Claude）"},
-        {"type": "rss", "url": "https://blog.google/technology/ai/rss/", "source": "Google 官方博客（Gemini）"},
-        {"type": "rss", "url": "https://azure.microsoft.com/en-us/blog/feed/", "source": "微软 Azure 官方博客"},
-        {"type": "rss", "url": "https://ai.meta.com/blog/rss/", "source": "Meta AI 官方博客"},
-        {"type": "rss", "url": "https://mistral.ai/news/rss.xml", "source": "Mistral AI 官方"},
-        {"type": "rss", "url": "https://x.ai/blog/rss.xml", "source": "xAI 官方（Grok）"},
-        {"type": "rss", "url": "https://cohere.com/blog/rss.xml", "source": "Cohere 官方"},
-        {"type": "html", "url": "https://cloud.baidu.com/product/wenxinworkshop", "source": "百度智能云千帆（文心）"},
-        {"type": "html", "url": "https://bailian.aliyun.com/", "source": "阿里云百炼（通义）"},
-        {"type": "html", "url": "https://open.bigmodel.cn/", "source": "智谱 AI（GLM）"},
+        {"type": "rss", "url": "https://openai.com/news/rss.xml", "source": "OpenAI 官方（GPT）", "core": True},
+        {"type": "html", "url": "https://www.anthropic.com/news", "source": "Anthropic 官方（Claude）", "core": True},
+        {"type": "rss", "url": "https://blog.google/technology/ai/rss/", "source": "Google 官方博客（Gemini）", "core": True},
+        {"type": "rss", "url": "https://azure.microsoft.com/en-us/blog/feed/", "source": "微软 Azure 官方博客", "core": True},
+        {"type": "rss", "url": "https://ai.meta.com/blog/rss/", "source": "Meta AI 官方博客", "core": True},
+        {"type": "rss", "url": "https://mistral.ai/news/rss.xml", "source": "Mistral AI 官方", "core": True},
+        {"type": "rss", "url": "https://x.ai/blog/rss.xml", "source": "xAI 官方（Grok）", "core": True},
+        {"type": "rss", "url": "https://cohere.com/blog/rss.xml", "source": "Cohere 官方", "core": True},
+        {"type": "html", "url": "https://cloud.baidu.com/product/wenxinworkshop", "source": "百度智能云千帆（文心）", "core": True},
+        {"type": "html", "url": "https://bailian.aliyun.com/", "source": "阿里云百炼（通义）", "core": True},
+        {"type": "html", "url": "https://open.bigmodel.cn/", "source": "智谱 AI（GLM）", "core": True},
         # 权威行业媒体（可抓取、同日过滤；对应公众号同源）
         {"type": "rss", "url": "https://www.qbitai.com/feed", "source": "量子位（AI 媒体）"},
         {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）"},
@@ -121,34 +128,36 @@ SOURCES = {
         {"type": "rss", "url": "https://www.marktechpost.com/feed/", "source": "Marktechpost（AI 媒体）"},
     ],
     "compute_foreign": [
-        {"type": "rss", "url": "https://nvidianews.nvidia.com/news/rss", "source": "NVIDIA 英伟达", "vendor": "英伟达 NVIDIA", "region": "foreign"},
-        {"type": "html", "url": "https://www.amd.com/en/newsroom.html", "source": "AMD 官方", "vendor": "AMD", "region": "foreign"},
-        {"type": "rss", "url": "https://newsroom.intel.com/feed/", "source": "Intel 英特尔", "vendor": "Intel 英特尔", "region": "foreign"},
+        {"type": "rss", "url": "https://nvidianews.nvidia.com/news/rss", "source": "NVIDIA 英伟达", "vendor": "英伟达 NVIDIA", "region": "foreign", "core": True},
+        {"type": "html", "url": "https://www.amd.com/en/newsroom.html", "source": "AMD 官方", "vendor": "AMD", "region": "foreign", "core": True},
+        {"type": "rss", "url": "https://newsroom.intel.com/feed/", "source": "Intel 英特尔", "vendor": "Intel 英特尔", "region": "foreign", "core": True},
         # 权威硬件/半导体媒体（尽力而为；超时不影响主流程）
-        {"type": "rss", "url": "https://www.servethehome.com/feed/", "source": "ServeTheHome（硬件媒体）", "region": "foreign"},
-        {"type": "rss", "url": "https://www.tomshardware.com/feeds/all", "source": "Tom's Hardware（硬件媒体）", "region": "foreign"},
+        {"type": "rss", "url": "https://www.servethehome.com/feed/", "source": "ServeTheHome（硬件媒体）", "region": "foreign", "core": True},
+        {"type": "rss", "url": "https://www.tomshardware.com/feeds/all", "source": "Tom's Hardware（硬件媒体）", "region": "foreign", "core": True},
     ],
     "compute_domestic": [
-        {"type": "html", "url": "https://www.hiascend.com/", "source": "华为昇腾", "vendor": "华为昇腾", "region": "domestic"},
-        {"type": "html", "url": "https://www.cambricon.com/", "source": "寒武纪", "vendor": "寒武纪", "region": "domestic"},
-        {"type": "html", "url": "https://www.mthreads.com/", "source": "摩尔线程", "vendor": "摩尔线程", "region": "domestic"},
-        {"type": "html", "url": "https://www.metax-tech.com/", "source": "沐曦股份", "vendor": "沐曦股份", "region": "domestic"},
-        {"type": "html", "url": "https://www.birentech.com/", "source": "壁仞科技", "vendor": "壁仞科技", "region": "domestic"},
-        {"type": "html", "url": "https://www.iluvatar.com/", "source": "天数智芯", "vendor": "天数智芯", "region": "domestic"},
-        {"type": "html", "url": "https://www.enflame-tech.com/", "source": "燧原科技", "vendor": "燧原科技", "region": "domestic"},
-        {"type": "html", "url": "https://www.kunlunxin.com/", "source": "昆仑芯", "vendor": "昆仑芯", "region": "domestic"},
+        {"type": "html", "url": "https://www.hiascend.com/", "source": "华为昇腾", "vendor": "华为昇腾", "region": "domestic", "core": True},
+        {"type": "html", "url": "https://www.cambricon.com/", "source": "寒武纪", "vendor": "寒武纪", "region": "domestic", "core": True},
+        {"type": "html", "url": "https://www.mthreads.com/", "source": "摩尔线程", "vendor": "摩尔线程", "region": "domestic", "core": True},
+        {"type": "html", "url": "https://www.metax-tech.com/", "source": "沐曦股份", "vendor": "沐曦股份", "region": "domestic", "core": True},
+        {"type": "html", "url": "https://www.birentech.com/", "source": "壁仞科技", "vendor": "壁仞科技", "region": "domestic", "core": True},
+        {"type": "html", "url": "https://www.iluvatar.com/", "source": "天数智芯", "vendor": "天数智芯", "region": "domestic", "core": True},
+        {"type": "html", "url": "https://www.enflame-tech.com/", "source": "燧原科技", "vendor": "燧原科技", "region": "domestic", "core": True},
+        {"type": "html", "url": "https://www.kunlunxin.com/", "source": "昆仑芯", "vendor": "昆仑芯", "region": "domestic", "core": True},
         # 权威半导体媒体（尽力而为；超时不影响主流程）
-        {"type": "rss", "url": "https://www.jiwei.com.cn/rss", "source": "集微网（半导体媒体）", "region": "domestic"},
+        {"type": "rss", "url": "https://www.jiwei.com.cn/rss", "source": "集微网（半导体媒体）", "region": "domestic", "core": True},
     ],
     "jd": [
-        {"type": "html", "url": "https://e.jd.com/", "source": "京东企业业务"},
-        {"type": "html", "url": "https://www.jdcloud.com/", "source": "京东云"},
-        {"type": "html", "url": "https://news.jd.com/", "source": "京东黑板报（官方资讯）"},
+        {"type": "html", "url": "https://e.jd.com/", "source": "京东企业业务", "core": True},
+        {"type": "html", "url": "https://www.jdcloud.com/", "source": "京东云", "core": True},
+        {"type": "html", "url": "https://news.jd.com/", "source": "京东黑板报（官方资讯）", "core": True},
         # 权威科技/企业媒体（可抓取、同日过滤、关键词把关；对应公众号同源）
         {"type": "rss", "url": "https://www.tmtpost.com/rss.xml", "source": "钛媒体（科技媒体）"},
         {"type": "rss", "url": "https://www.36kr.com/feed", "source": "36氪（科技媒体）"},
     ],
 }
+# 官方厂商 + 垂直行业媒体源（core）：默认与本板块相关，不参与关键词过滤
+CORE_SOURCES = {src["source"] for grp in SOURCES.values() for src in grp if src.get("core")}
 
 # ---- 官方关注渠道（某板块当日无更新时展示，供用户自行关注；均为权威官方站点）----
 CHANNELS = {
