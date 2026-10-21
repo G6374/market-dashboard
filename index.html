@@ -1002,20 +1002,24 @@
         body += '<div class="summary"><span class="lbl">每日小结</span>'+annotate(entry.summary||'')+'</div>';
         const items = entry.items || [];
 
-        if(sec.id === 'compute'){
-          const foreign = items.filter(i=>i.region==='foreign');
-          const domestic = items.filter(i=>i.region==='domestic');
-          body += groupHtml('国外厂商', foreign);
-          body += groupHtml('国内厂商', domestic);
+        if(sec.id === 'storage' || sec.id === 'token' || sec.id === 'compute'){
+          // 按 国外 / 国内 分组展示，各组无内容时展示对应官方关注渠道
+          for(const rg of [['foreign','国外'],['domestic','国内']]){
+            const gi = items.filter(i => i.region === rg[0]);
+            if(gi.length){
+              body += groupHtml(rg[1], gi);
+            }else{
+              const ch = (sec.channels||[]).filter(c => c.region === rg[0] || !c.region);
+              body += '<div class="group-title">'+rg[1]+'</div>' + (ch.length ? channelsHtml(ch) : '<div class="empty">暂无动态</div>');
+            }
+          }
         } else {
-          body += itemsHtml(items);
+          if(items.length){
+            body += itemsHtml(items);
+          } else {
+            body += channelsHtml(sec.channels);
+          }
         }
-      }
-
-      // 无更新（或当日无条目）时，展示官方关注渠道，便于用户自行跟进
-      const hasItems = entry && (entry.items||[]).length > 0;
-      if(!hasItems){
-        body += channelsHtml(sec.channels);
       }
 
       card.innerHTML =
