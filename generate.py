@@ -697,6 +697,73 @@ def verify_before_publish(data):
             )
     return data
 
+# ---------- 发布前质量门禁：逐项核对用户三天（10-19~10-21）提出的全部约束 ----------
+def quality_gate(data, html):
+    """写回前逐项核对用户明确提出的硬性约束；任一【关键】项不通过则 sys.exit(1) 阻断发布。"""
+    print("== 质量门禁：核对用户三天提出的全部约束 ==")
+    critical_fail = []
+    checks = []
+
+    # A. 单页结构（不得回归三页导航 / 价格模块独立页）
+    three_tab = any(t in html for t in ['data-page="news"', 'data-page="price"', 'data-page="review"',
+                                        'id="pageNews"', 'id="pagePrice"', 'id="pageReview"'])
+    single_ok = (not three_tab) and all(s in html for s in ['id="grid"', 'id="reviewPanel"', 'id="footer"', 'class="toolbar"'])
+    checks.append(("单页结构（四市场动态+总结，无三页导航）", single_ok, True))
+    if not single_ok:
+        critical_fail.append("单页结构被破坏（出现三页导航或缺少主容器）")
+
+    # B. 价格模块永不回归
+    no_price = "priceModule" not in data
+    checks.append(("存储价格变动模块已移除且永不回归", no_price, True))
+    if not no_price:
+        critical_fail.append("priceModule 重新出现")
+
+    # C. 总结区存在（承载周报/月报）
+    has_review = any(s.get("type") == "review" for s in data["sections"])
+    checks.append(("总结区(review)存在，可承载周报/月报", has_review, True))
+    if not has_review:
+        critical_fail.append("review 板块缺失，周报/月报无处安放")
+
+    # D. 四市场板块齐全
+    ids = {s["id"] for s in data["sections"]}
+    four_ok = {"storage", "token", "compute", "jd"}.issubset(ids)
+    checks.append(("四市场板块齐全(存储/Token/算力/京东政企)", four_ok, True))
+    if not four_ok:
+        critical_fail.append("市场板块缺失: " + ",".join({"storage", "token", "compute", "jd"} - ids))
+
+    # E. 国内外分组关键词齐备（算力/Token/存储均分国内外）
+    split_ok = all(f"{k}_{r}" in KEYWORDS for k in ("storage", "token", "compute") for r in ("foreign", "domestic"))
+    checks.append(("存储/Token/算力均分国外+国内两组", split_ok, False))
+
+    # F. 日期与 updatedAt
+    ua_ok = data.get("meta", {}).get("updatedAt") == BIZ_STR
+    checks.append((f"updatedAt 等于目标日 {BIZ_STR}", ua_ok, False))
+
+    # G. 所有条目链接合法 http(s)（可达性已在 verify_before_publish 过滤）
+    bad = []
+    for sec in data["sections"]:
+        if sec.get("type") == "review":
+            continue
+        for d, e in (sec.get("dates") or {}).items():
+            for it in (e.get("items") or []):
+                u = str(it.get("url", ""))
+                if not u.lower().startswith("http"):
+                    bad.append(f"{sec['name']}/{d}:{it.get('title', '')[:16]}")
+    link_ok = not bad
+    checks.append(("全部条目链接为合法 http(s)", link_ok, False))
+    if bad:
+        print("    非法链接:", bad[:5])
+
+    for name, ok, crit in checks:
+        tag = "[关键]" if crit else "[常规]"
+        print(f"  [{'通过' if ok else '不通过'}] {tag} {name}")
+    print(f"== 门禁结果：{'全部通过' if not critical_fail else '存在关键项不通过，阻断发布'} ==")
+    if critical_fail:
+        for f in critical_fail:
+            print("  [不通过]", f)
+        sys.exit(1)
+    return data
+
 # ---------- 主流程 ----------
 def main():
     html = open(INDEX, encoding="utf-8").read()
@@ -757,6 +824,9 @@ def main():
 
     # 发布前统一自检（当日 / 死链 / 相关性 / 链接一致性）
     data = verify_before_publish(data)
+
+    # 质量门禁：逐项核对用户三天提出的全部约束，关键项不通过则阻断发布
+    data = quality_gate(data, html)
 
     # 清理 >30 天历史
     cutoff = (BIZ_DATE - datetime.timedelta(days=30)).strftime("%Y-%m-%d")
