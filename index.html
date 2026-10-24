@@ -303,7 +303,7 @@
 <script type="application/json" id="market-data">{
   "meta": {
     "title": "市场动态看板",
-    "updatedAt": "2026-10-23",
+    "updatedAt": "2026-10-24",
     "isPrototype": false,
     "prototypeNote": "每日北京时间 24:00（次日 00:00）自动更新；数据来自各厂商官网 Newsroom 与权威行业媒体（TrendForce 等）官方来源，严格只收录当日发布的资讯。周总结每周日 24:00 生成，月总结每月最后一天 24:00 生成；历史保留 30 天。"
   },
@@ -674,6 +674,62 @@
               "region": "foreign"
             }
           ],
+          "channels": [
+            {
+              "name": "三星 Samsung Newsroom",
+              "url": "https://news.samsung.com/global/",
+              "region": "foreign"
+            },
+            {
+              "name": "SK 海力士",
+              "url": "https://news.skhynix.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "美光 Micron",
+              "url": "https://www.micron.com/about/newsroom",
+              "region": "foreign"
+            },
+            {
+              "name": "西部数据 Western Digital",
+              "url": "https://blog.westerndigital.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "铠侠 Kioxia",
+              "url": "https://www.kioxia.com/en-us/",
+              "region": "foreign"
+            },
+            {
+              "name": "TrendForce 集邦咨询",
+              "url": "https://www.trendforce.com/news/",
+              "region": "foreign"
+            },
+            {
+              "name": "长江存储 YMTC",
+              "url": "https://www.ymtc.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "长鑫存储 CXMT",
+              "url": "https://www.cxmt.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "兆易创新",
+              "url": "https://www.gigadevice.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "澜起科技",
+              "url": "https://www.montage-tech.com/",
+              "region": "domestic"
+            }
+          ]
+        },
+        "2026-10-24": {
+          "summary": "今日（2026-10-24）未检索到与「存储市场」高度相关的官方更新，可点击下方官方渠道持续关注。",
+          "items": [],
           "channels": [
             {
               "name": "三星 Samsung Newsroom",
@@ -1280,6 +1336,107 @@
               "region": "domestic"
             }
           ]
+        },
+        "2026-10-24": {
+          "summary": "国外：2026-10-24 当日，国外大模型 API 板块的官方动态数量较少，OpenAI 英伟达之外的主流厂商未见新条目发布。唯一一条动态来自 OpenAI 官方，主题是支撑 ChatGPT 海量用户规模的在线存储扩容，属于基础设施层面的能力建设，而非直接的计费、配额或模型发布信息。该动态与 API 服务的承载能力和稳定性间接相关，但与 Token 价格、上下文窗口等核心关注点关联有限。\n国内：当日国内大模型市场出现两项值得关注的动向：一是国产大模型 API 均价上行至约 13 元，反映计费水平整体抬升；二是腾讯 WorkBuddy 接入 Kimi-K3.1-Pro 模型，显示第三方应用对国产模型 API 的集成持续扩展。整体看，价格与生态接入是本日 Token 市场的两条主线。",
+          "items": [
+            {
+              "title": "在线存储快速扩容，以服务超过 10 亿 ChatGPT 用户（第二部分）",
+              "source": "OpenAI 官方（GPT）",
+              "url": "https://openai.com/index/scaling-storage-one-billion-users-part-two",
+              "excerpt": "OpenAI 官方发布技术文章第二部分，介绍其在线存储系统如何快速扩容，以支撑超过 10 亿 ChatGPT 用户的访问规模。该内容聚焦基础设施层面的存储能力建设，说明平台在大规模用户量下的稳定性保障思路。该动态未涉及 API 计费、Token 价格或模型发布等具体商务信息，但与 API 服务的整体承载能力间接相关。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "国内大模型均价涨至13元，寒武纪三季度净利润同比增长147.74%",
+              "source": "36氪（科技媒体）",
+              "url": "https://36kr.com/p/4039177193411718?f=rss",
+              "excerpt": "当日行业汇总显示，国内大模型 API 的平均价格已升至约 13 元，直接关系开发者调用模型的计费成本。同一汇总还提到寒武纪第三季度净利润 14.04 亿元、同比增长 147.74%，反映算力芯片环节的景气变化。对普通用户而言，这意味着使用国产大模型服务的单位成本可能有所上升。",
+              "vendor": "",
+              "region": "domestic"
+            },
+            {
+              "title": "腾讯 WorkBuddy 接入模型 Kimi-K3.1-Pro",
+              "source": "36氪（科技媒体）",
+              "url": "https://36kr.com/newsflashes/4039662177653892?f=rss",
+              "excerpt": "腾讯旗下 WorkBuddy 产品已接入 Kimi-K3.1-Pro 模型，属于国产大模型 API 在第三方应用中的一次集成更新。此举意味着用户可在腾讯产品内直接调用 Kimi 系列模型能力，也体现模型厂商与应用方之间的生态合作在扩展。对关注 Token 市场的读者而言，这类接入会影响模型的实际调用量与计费场景。",
+              "vendor": "",
+              "region": "domestic"
+            }
+          ],
+          "channels": [
+            {
+              "name": "OpenAI 官方（GPT）",
+              "url": "https://openai.com/news",
+              "region": "foreign"
+            },
+            {
+              "name": "Anthropic 官方（Claude）",
+              "url": "https://www.anthropic.com/news",
+              "region": "foreign"
+            },
+            {
+              "name": "Google 官方博客（Gemini）",
+              "url": "https://blog.google/technology/ai/",
+              "region": "foreign"
+            },
+            {
+              "name": "微软 Azure 官方博客",
+              "url": "https://azure.microsoft.com/en-us/blog/",
+              "region": "foreign"
+            },
+            {
+              "name": "Meta AI 官方博客",
+              "url": "https://ai.meta.com/blog/",
+              "region": "foreign"
+            },
+            {
+              "name": "Mistral AI 官方",
+              "url": "https://mistral.ai/news",
+              "region": "foreign"
+            },
+            {
+              "name": "xAI 官方（Grok）",
+              "url": "https://x.ai/blog",
+              "region": "foreign"
+            },
+            {
+              "name": "Cohere 官方",
+              "url": "https://cohere.com/blog",
+              "region": "foreign"
+            },
+            {
+              "name": "百度智能云千帆（文心）",
+              "url": "https://cloud.baidu.com/product/wenxinworkshop",
+              "region": "domestic"
+            },
+            {
+              "name": "阿里云百炼（通义）",
+              "url": "https://bailian.aliyun.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "智谱 AI（GLM）",
+              "url": "https://open.bigmodel.cn/",
+              "region": "domestic"
+            },
+            {
+              "name": "月之暗面 Kimi",
+              "url": "https://kimi.moonshot.cn/",
+              "region": "domestic"
+            },
+            {
+              "name": "DeepSeek 深度求索",
+              "url": "https://www.deepseek.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "讯飞星火",
+              "url": "https://xinghuo.xfyun.cn/",
+              "region": "domestic"
+            }
+          ]
         }
       },
       "channels": [
@@ -1754,6 +1911,82 @@
               "region": "domestic"
             }
           ]
+        },
+        "2026-10-24": {
+          "summary": "国外：当日算力市场国外板块的动态主要围绕高端GPU硬件展开：一方面，厂商推出了基于NVIDIA GB300平台的工作站产品，面向专业AI计算场景；另一方面，消费级显卡RTX 5070 Ti出现促销，而工业级RTX 5090则被曝出大规模拆解用于AI服务器，反映出算力硬件在消费与工业应用之间的流动与再配置。整体来看，算力硬件的供给与需求持续活跃，高端芯片的多元化利用成为关注点。",
+          "items": [
+            {
+              "title": "微星XpertStation WS300评测：对标NVIDIA DGX Station GB300",
+              "source": "ServeTheHome（硬件媒体）",
+              "url": "https://www.servethehome.com/msi-xpertstation-ws300-review-nvidia-dgx-station-gb300/",
+              "excerpt": "该条目为微星XpertStation WS300工作站的评测，重点对比了其与NVIDIA DGX Station GB300的性能与设计。文章面向专业用户，分析了该工作站搭载NVIDIA GB300平台后的算力表现，为需要本地AI计算能力的企业提供了参考。评测基于官方数据，展示了硬件配置与实际应用场景的匹配度。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "宏碁超薄RTX 5070 Ti游戏笔记本最高优惠800美元：16GB内存版2225美元，32GB版2400美元",
+              "source": "Tom's Hardware（硬件媒体）",
+              "url": "https://www.tomshardware.com/laptops/gaming-laptops/save-up-to-usd800-on-acers-ultra-slim-rtx-5070-ti-gaming-laptop-pay-usd2225-for-the-16gb-ram-model-or-upgrade-to-32gb-for-usd2400",
+              "excerpt": "宏碁超薄游戏笔记本搭载RTX 5070 Ti显卡，目前提供最高800美元的折扣。16GB内存版本售价2225美元，而32GB内存版本售价2400美元，适合需要移动高性能图形处理的用户。该促销信息为关注消费级算力硬件的用户提供了购买参考。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "泄露视频曝光中国工厂大规模拆解RTX 5090以供应AI服务器",
+              "source": "Tom's Hardware（硬件媒体）",
+              "url": "https://www.tomshardware.com/pc-components/gpus/leaked-video-exposes-how-chinese-factories-are-stripping-rtx-5090s-to-fuel-ai-custom-partner-cards-to-nvidia-founders-editions-on-the-chopping-block",
+              "excerpt": "一段泄露视频显示，中国工厂正在成千上万地拆解RTX 5090显卡，将其用于AI服务器。这一现象反映了高端消费级显卡在工业算力需求下的再配置趋势，凸显了AI服务器市场对高性能芯片的旺盛需求。视频内容引发了对显卡供应链和算力资源分配的讨论。",
+              "vendor": "",
+              "region": "foreign"
+            }
+          ],
+          "channels": [
+            {
+              "name": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "AMD 官方",
+              "url": "https://www.amd.com/en/newsroom.html",
+              "region": "foreign"
+            },
+            {
+              "name": "Intel 英特尔",
+              "url": "https://newsroom.intel.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "华为昇腾",
+              "url": "https://www.hiascend.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "寒武纪",
+              "url": "https://www.cambricon.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "摩尔线程",
+              "url": "https://www.mthreads.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "沐曦股份",
+              "url": "https://www.metax-tech.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "壁仞科技",
+              "url": "https://www.birentech.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "天数智芯",
+              "url": "https://www.iluvatar.com/",
+              "region": "domestic"
+            }
+          ]
         }
       },
       "channels": [
@@ -1949,6 +2182,42 @@
         },
         "2026-10-23": {
           "summary": "今日（2026-10-23）未检索到与「京东政企」高度相关的官方更新，可点击下方官方渠道持续关注。",
+          "items": [],
+          "channels": [
+            {
+              "name": "京东企业业务",
+              "url": "https://e.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东云",
+              "url": "https://www.jdcloud.com/",
+              "region": ""
+            },
+            {
+              "name": "京东",
+              "url": "https://www.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东黑板报（官方资讯）",
+              "url": "https://news.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东物流",
+              "url": "https://www.jdl.com/",
+              "region": ""
+            },
+            {
+              "name": "京东工业",
+              "url": "https://www.jd.com/",
+              "region": ""
+            }
+          ]
+        },
+        "2026-10-24": {
+          "summary": "今日（2026-10-24）未检索到与「京东政企」高度相关的官方更新，可点击下方官方渠道持续关注。",
           "items": [],
           "channels": [
             {
