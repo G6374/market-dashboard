@@ -498,7 +498,7 @@ def _translate_text(text):
         return text
 
 # ---------- 调用 LLM（主+兜底，按能力从强到弱）----------
-def call_llm(system, user, temperature=0.3):
+def call_llm(system, user, temperature=0.3, json_mode=True):
     providers = []
     if PRIMARY[1]:
         providers.append(PRIMARY)
@@ -508,12 +508,14 @@ def call_llm(system, user, temperature=0.3):
     last_err = None
     for url, key, model in providers:
         try:
+            payload = {"model": model, "temperature": temperature,
+                      "messages": [{"role": "system", "content": system},
+                                   {"role": "user", "content": user}]}
+            if json_mode:
+                payload["response_format"] = {"type": "json_object"}
             resp = requests.post(url,
                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-                json={"model": model, "temperature": temperature,
-                      "response_format": {"type": "json_object"},
-                      "messages": [{"role": "system", "content": system},
-                                   {"role": "user", "content": user}]},
+                json=payload,
                 timeout=180)
             resp.raise_for_status()
             return resp.json()["choices"][0]["message"]["content"]
@@ -650,17 +652,58 @@ def build_review(data):
         if sums:
             review["monthly"] = {"period": f"{start} 至 {BIZ_DATE}", "summary": synthesize_review("月", start, BIZ_DATE, sums)}
 
+def _review_cleanup(txt):
+    t = (txt or "").strip()
+    t = re.sub(r"\n{3,}", "\n\n", t)   # 折叠连续空行（退化输出特征）
+    return t
+
+def _review_prose_ok(txt):
+    """周/月总结必须是可读中文散文；拒绝 JSON 碎片、代码块、退化空行输出。"""
+    if not txt:
+        return False
+    t = txt.strip()
+    if len(t) < 60:
+        return False
+    if t[0] in "{[`" or t.lower().startswith("json"):
+        return False
+    if "```" in t or '"summary"' in t:
+        return False
+    cjk = sum(1 for ch in t if "\u4e00" <= ch <= "\u9fff")
+    if cjk < 40:
+        return False
+    lines = t.splitlines()
+    if lines and sum(1 for l in lines if not l.strip()) / len(lines) > 0.3:
+        return False
+    return True
+
 def synthesize_review(kind, start, end, sums):
     system = ("你是中国市场动态看板的资深分析师，面向不懂技术的小白用户。"
               "要求：书面化但不口语化、无门槛可读；严格基于提供的各板块每日小结，不得编造；"
-              "可做横向对比与趋势概括，对专业术语自然使用（前端会自动注释）。输出简体中文。")
+              "可做横向对比与趋势概括，对专业术语自然使用（前端会自动注释）。输出简体中文。"
+              "只输出总结正文本身，禁止输出 JSON、代码块、字段名或任何格式符号。")
     user = (f"以下是 {start} 至 {end} 各板块的每日小结，请综合写成一段「{kind}总结」（4-6 句，概括四大市场整体动向与趋势，简体中文）：\n"
             f"{json.dumps(sums, ensure_ascii=False, indent=2)}")
-    try:
-        return call_llm(system, user, temperature=0.4)
-    except Exception as ex:
-        print(f"  [REVIEW LLM失败]: {ex}")
-        return f"{kind}总结生成失败，请稍后查看各板块每日小结。"
+    last = ""
+    for attempt, temp in enumerate((0.4, 0.7, 0.9), 1):
+        try:
+            txt = call_llm(system, user, temperature=temp, json_mode=False)
+        except Exception as ex:
+            print(f"  [REVIEW LLM失败 第{attempt}次]: {ex}")
+            continue
+        txt = _review_cleanup(txt)
+        if _review_prose_ok(txt):
+            return txt
+        last = txt
+        print(f"  [REVIEW 输出不合格 第{attempt}次] 长度={len(txt)}，换参数重试")
+    # 兜底：确定性拼接各板块每日小结（不依赖 LLM，保证永远可读）
+    print("  [REVIEW] LLM 多次输出不合格，启用确定性汇总兜底")
+    parts = [f"{kind}总结（{start} 至 {end}）：本周期四大市场动态要点如下。"]
+    for s in sums:
+        sm = (s.get("summary") or "").strip()
+        if sm:
+            parts.append(f"{s['section']}：{sm}")
+    parts.append("详细动态请查看对应日期的市场动态页。")
+    return "\n".join(parts)
 
 # ---------- 发布前统一自检（沿用此前所有硬性规则 + 本次相关性/链接一致性）----------
 def verify_before_publish(data):
@@ -723,6 +766,17 @@ def quality_gate(data, html):
     checks.append(("总结区(review)存在，可承载周报/月报", has_review, True))
     if not has_review:
         critical_fail.append("review 板块缺失，周报/月报无处安放")
+
+    # C2. 周/月总结必须是可读中文散文（拒绝 JSON 碎片 / 空行退化等乱码）
+    rev = next((s for s in data["sections"] if s.get("type") == "review"), None)
+    bad_rev = []
+    for key in ("weekly", "monthly"):
+        txt = ((rev or {}).get(key) or {}).get("summary", "")
+        if txt and not _review_prose_ok(_review_cleanup(txt)):
+            bad_rev.append(key)
+    checks.append(("周/月总结为可读中文散文（无乱码/JSON碎片）", not bad_rev, True))
+    if bad_rev:
+        critical_fail.append("总结内容不合格（疑似乱码/JSON碎片）: " + ",".join(bad_rev))
 
     # D. 四市场板块齐全
     ids = {s["id"] for s in data["sections"]}
