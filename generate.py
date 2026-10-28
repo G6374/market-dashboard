@@ -599,8 +599,16 @@ def synthesize(section_label, items, channels=None):
             "}\n"
             "items 仅包含你筛选后保留的条目，但每个 idx 必须与输入一致、可对应回原文真实链接。")
     try:
-        txt = call_llm(system, user)
-        data = _llm_json(txt)
+        data = None
+        for attempt in (1, 2):
+            try:
+                txt = call_llm(system, user)
+                data = _llm_json(txt)
+                break
+            except Exception as ex:
+                if attempt == 2:
+                    raise
+                print(f"  [LLM输出异常 {section_label} 第{attempt}次，重试]: {ex}")
         summary = (data.get("summary") or "").strip()
         if summary and not _trans_ok(summary):
             print(f"  [summary 字段异常，弃用] {summary[:60]!r}")
