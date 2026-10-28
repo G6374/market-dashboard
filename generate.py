@@ -463,6 +463,40 @@ def _need_cn(s):
         return False
     return not _has_cjk(s)
 
+def _trans_ok(s):
+    """翻译/生成的标题、摘要必须是干净文本；拒绝 JSON 碎片、代码块、字段名。"""
+    t = (s or "").strip()
+    if not t or len(t) < 4:
+        return False
+    if t[0] in "{[`:：":
+        return False
+    if "```" in t or '"翻译"' in t or t.lower().startswith("json"):
+        return False
+    return True
+
+def _llm_json(txt):
+    """解析 LLM 返回的 JSON；容忍 ```json 代码围栏与前后杂质。"""
+    t = (txt or "").strip()
+    t = re.sub(r"^```(?:json)?\s*|\s*```$", "", t, flags=re.S).strip()
+    try:
+        return json.loads(t)
+    except Exception:
+        pass
+    i = t.find("{")
+    if i >= 0:
+        depth = 0
+        for j in range(i, len(t)):
+            if t[j] == "{":
+                depth += 1
+            elif t[j] == "}":
+                depth -= 1
+                if depth == 0:
+                    try:
+                        return json.loads(t[i:j + 1])
+                    except Exception:
+                        break
+    raise ValueError(f"LLM 输出不是有效 JSON: {t[:80]!r}")
+
 def _translate_batch(pairs):
     """pairs: [(idx, title, excerpt), ...]；返回 {idx: (title, excerpt)} 中文版。"""
     if not pairs:
@@ -474,14 +508,15 @@ def _translate_batch(pairs):
     user = "请将以下条目翻译为简体中文：\n" + json.dumps(payload, ensure_ascii=False, indent=2)
     try:
         txt = call_llm(system, user, temperature=0.2)
-        d = json.loads(txt)
+        d = _llm_json(txt)
         out = {}
         for g in (d.get("items") or []):
             try:
                 idx = int(g.get("idx"))
             except Exception:
                 continue
-            out[idx] = (g.get("title", ""), g.get("excerpt", ""))
+            t, e = (g.get("title") or "").strip(), (g.get("excerpt") or "").strip()
+            out[idx] = (t if _trans_ok(t) else "", e if _trans_ok(e) else "")
         return out
     except Exception as ex:
         print(f"  [翻译失败] {ex}")
@@ -490,9 +525,14 @@ def _translate_batch(pairs):
 def _translate_text(text):
     if not _need_cn(text):
         return text
-    system = "你是将英文科技资讯翻译为书面化简体中文的翻译专家。专有名词保留英文并附中文。只输出翻译结果，不要解释。"
+    system = ("你是将英文科技资讯翻译为书面化简体中文的翻译专家。专有名词保留英文并附中文。"
+              "只输出译文正文，禁止输出 JSON、代码块、字段名或任何解释。")
     try:
-        return call_llm(system, "翻译：\n" + text, temperature=0.2).strip().strip('"').strip()
+        out = _review_cleanup(call_llm(system, "翻译：\n" + text, temperature=0.2, json_mode=False))
+        if _trans_ok(out) and _has_cjk(out):
+            return out
+        print(f"  [翻译输出不合格，保留原文] {out[:60]!r}")
+        return text
     except Exception as ex:
         print(f"  [摘要翻译失败] {ex}")
         return text
@@ -560,8 +600,11 @@ def synthesize(section_label, items, channels=None):
             "items 仅包含你筛选后保留的条目，但每个 idx 必须与输入一致、可对应回原文真实链接。")
     try:
         txt = call_llm(system, user)
-        data = json.loads(txt)
+        data = _llm_json(txt)
         summary = (data.get("summary") or "").strip()
+        if summary and not _trans_ok(summary):
+            print(f"  [summary 字段异常，弃用] {summary[:60]!r}")
+            summary = ""
         # 以 idx 为键回贴，绝不按位置配对（修复"标题与链接错位"）
         gens = {}
         for g in (data.get("items") or []):
@@ -575,11 +618,13 @@ def synthesize(section_label, items, channels=None):
             g = gens.get(it["_idx"])
             if not g:
                 continue   # 被 LLM 筛掉的条目不展示
+            t_new = (g.get("title") or "").strip()
+            e_new = (g.get("excerpt") or "").strip()
             out_items.append({
-                "title": (g.get("title") or it["title"]).strip(),
+                "title": t_new if (t_new and _trans_ok(t_new)) else it["title"],   # 标题异常时回退原题
                 "source": it["source"],
                 "url": it["url"],                       # 始终使用真实抓取的官方链接
-                "excerpt": (g.get("excerpt") or "").strip(),
+                "excerpt": e_new if (e_new and _trans_ok(e_new)) else "",
                 "vendor": it.get("vendor", ""),
                 "region": it.get("region", ""),
             })
@@ -614,6 +659,8 @@ def synthesize(section_label, items, channels=None):
             title = it["title"]
             if _need_cn(title):
                 title = _translate_text(title) or title
+            if not _trans_ok(title):        # 翻译结果异常（JSON碎片等）→ 保留原题
+                title = it["title"]
             out_items.append({"title": title, "source": it["source"], "url": it["url"],
                               "excerpt": "（摘要生成暂不可用，请点击来源查看官方原文）",
                               "vendor": it.get("vendor", ""), "region": it.get("region", "")})
@@ -777,6 +824,18 @@ def quality_gate(data, html):
     checks.append(("周/月总结为可读中文散文（无乱码/JSON碎片）", not bad_rev, True))
     if bad_rev:
         critical_fail.append("总结内容不合格（疑似乱码/JSON碎片）: " + ",".join(bad_rev))
+
+    # C3. 所有条目标题/摘要不得是 JSON 碎片或代码块（摘要有意留空属合法）
+    junk = []
+    for sec in data["sections"]:
+        for d, e in (sec.get("dates") or {}).items():
+            for it in (e.get("items") or []):
+                t, x = str(it.get("title", "")), str(it.get("excerpt", ""))
+                if not _trans_ok(t) or (x and not _trans_ok(x)):
+                    junk.append(f"{sec['name']}/{d}:{t[:24]}")
+    checks.append(("全部条目标题/摘要是干净文本（无JSON碎片）", not junk, True))
+    if junk:
+        critical_fail.append("条目标题/摘要疑似乱码（JSON碎片/代码块）: " + "; ".join(junk[:3]))
 
     # D. 四市场板块齐全
     ids = {s["id"] for s in data["sections"]}
