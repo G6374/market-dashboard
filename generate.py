@@ -802,13 +802,18 @@ def quality_gate(data, html):
     critical_fail = []
     checks = []
 
-    # A. 单页结构（不得回归三页导航 / 价格模块独立页）
-    three_tab = any(t in html for t in ['data-page="news"', 'data-page="price"', 'data-page="review"',
-                                        'id="pageNews"', 'id="pagePrice"', 'id="pageReview"'])
-    single_ok = (not three_tab) and all(s in html for s in ['id="grid"', 'id="reviewPanel"', 'id="footer"', 'class="toolbar"'])
-    checks.append(("单页结构（四市场动态+总结，无三页导航）", single_ok, True))
+    # A. 布局结构：禁止旧三页导航标记（data-page="news"/price/review + pageNews/Price/Review）；
+    #    允许「按市场分五页」新布局（存储/Token/算力/京东政企/总结 各一页）。
+    old_three_tab = any(t in html for t in ['data-page="news"', 'data-page="price"', 'data-page="review"',
+                                            'id="pageNews"', 'id="pagePrice"', 'id="pageReview"'])
+    five_tab = all(t in html for t in [
+        'data-tab="storage"', 'data-tab="token"', 'data-tab="compute"', 'data-tab="jd"', 'data-tab="review"',
+        'id="panel-storage"', 'id="panel-token"', 'id="panel-compute"', 'id="panel-jd"', 'id="panel-review"',
+        'id="reviewPanel"', 'id="footer"', 'class="toolbar"'])
+    single_ok = (not old_three_tab) and five_tab
+    checks.append(("五页分栏布局（存储/Token/算力/京东政企/总结，无旧三页导航/价格模块独立页）", single_ok, True))
     if not single_ok:
-        critical_fail.append("单页结构被破坏（出现三页导航或缺少主容器）")
+        critical_fail.append("布局结构异常（出现旧三页导航标记，或缺少五页分栏容器）")
 
     # B. 价格模块永不回归
     no_price = "priceModule" not in data
