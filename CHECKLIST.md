@@ -4,7 +4,7 @@
 
 ## 关键项（不通过 → 阻断发布）
 
-1. **单页结构**：四市场动态 + 总结在同一页，不得出现三页导航（`pageNews`/`pagePrice`/`pageReview` 或 `data-page`），且主容器 `#grid`/`#reviewPanel`/`#footer`/`.toolbar` 齐全。
+1. **五页分栏布局**：按市场分为五页——存储市场 / Token 市场 / 算力市场 / 京东政企 / 周月总结（各 `data-tab` + `panel-{id}` 容器，id 为 storage/token/compute/jd/review），禁止旧三页导航标记（`pageNews`/`pagePrice`/`pageReview` 或 `data-page="news"/price/review`）；`#reviewPanel`/`#footer`/`.toolbar` 与五个面板容器齐全。内容数据不变，仅布局分栏。
 2. **价格模块已移除**：`priceModule` 数据键永不再出现（用户 10-21 决定移除）。
 3. **总结区存在**：`review` 板块（type=review）存在，用于承载周报/月报。
 4. **四市场板块齐全**：`storage` / `token` / `compute` / `jd` 四个 id 缺一不可。
