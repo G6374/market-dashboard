@@ -1,29 +1,32 @@
-# 看板发布前检查清单（用户三天问题汇总）
+# 看板发布前检查清单（用户问题汇总）
 
 本清单由 `generate.py` 的 `quality_gate()` 在每次发布（写回 index.html 前）自动核对，并打印到 GitHub Actions 日志。任一【关键】项不通过会 `sys.exit(1)` 阻断发布，避免带病上线。
 
 ## 关键项（不通过 → 阻断发布）
 
 1. **五页分栏布局**：按市场分为五页——存储市场 / Token 市场 / 算力市场 / 京东政企 / 周月总结（各 `data-tab` + `panel-{id}` 容器，id 为 storage/token/compute/jd/review），禁止旧三页导航标记（`pageNews`/`pagePrice`/`pageReview` 或 `data-page="news"/price/review`）；`#reviewPanel`/`#footer`/`.toolbar` 与五个面板容器齐全。内容数据不变，仅布局分栏。
-2. **价格模块已移除**：`priceModule` 数据键永不再出现（用户 10-21 决定移除）。
-3. **总结区存在**：`review` 板块（type=review）存在，用于承载周报/月报。
-4. **四市场板块齐全**：`storage` / `token` / `compute` / `jd` 四个 id 缺一不可。
+2. **旧价格模块已移除**：`priceModule` 数据键永不再出现（用户 10-21 决定移除旧「存储价格变动」独立模块）。
+3. **内存价格变化模块**：位于「存储市场」页内（`memoryPrice` 顶层键 + `renderMemoryPrice()` / `mp-table` 渲染），数据合法（weeks 与每条 prices 列数一致、价格非负、链接为 https）、不得退回独立价格页。A股配色：涨=红、跌=绿。
+4. **总结区存在**：`review` 板块（type=review）存在，用于承载周报/月报。
+5. **总结为可读中文散文**：周/月总结（含 `weeks`/`months` 历史归档）不得是 JSON 碎片 / 代码块 / 空行退化；所有条目标题与摘要必须是干净文本。
+6. **四市场板块齐全**：`storage` / `token` / `compute` / `jd` 四个 id 缺一不可。
 
 ## 常规项（由代码逻辑保证，仅记录核对）
 
-5. 存储 / Token / 算力均分 `国外 + 国内` 两组（KEYWORDS 齐备）。
-6. `updatedAt` == 目标日 `BIZ_STR`。
-7. 全部条目链接为合法 `http(s)`（死链/不可达/404/5xx 已在 `verify_before_publish` 过滤剔除）。
-8. 标题—链接稳定配对（`_idx` 序号配对，绝不错位）。
-9. 厂商源按关键词卡严（`_relevant` 对所有来源含官方生效）。
-10. 算力严格分国内外；官网优先（`official` > `media`）。
-11. 外文标题/要点统一翻译为书面化中文摘要。
-12. 某板块当日无更新时，展示官方关注渠道（不空白）。
-13. 只收录发布日 == 目标日的资讯，绝不追溯、绝不杜撰。
-14. 每日北京时间 24:00 更新（cron `0 16 * * *` UTC）。
-15. 周报每周日 24:00 生成（`build_review`：`BIZ_DATE.weekday()==6`）；月报每月最后一天 24:00 生成（`is_last_day(BIZ_DATE)`）。
-16. 历史保留 30 天。
-17. 媒体源相关性"暂不收紧"（扩源但相关性卡严，后续可能再收紧）。
+7. 存储 / Token / 算力均分 `国外 + 国内` 两组（KEYWORDS 齐备）。
+8. `updatedAt` == 目标日 `BIZ_STR`。
+9. 全部条目链接为合法 `http(s)`（死链/不可达/404/5xx 已在 `verify_before_publish` 过滤剔除）。
+10. 标题—链接稳定配对（`_idx` 序号配对，绝不错位）。
+11. 厂商源按关键词卡严（`_relevant` 对所有来源含官方生效）。
+12. 算力严格分国内外；官网优先（`official` > `media`）。
+13. 外文标题/要点统一翻译为书面化中文摘要。
+14. 某板块当日无更新时，展示官方关注渠道（不空白）。
+15. 只收录发布日 == 目标日的资讯，绝不追溯、绝不杜撰。
+16. 每日北京时间 24:00 更新（cron `0 16 * * *` UTC）。
+17. 周报每周日 24:00 生成（`build_review`：`BIZ_DATE.weekday()==6`）；月报每月最后一天 24:00 生成（`is_last_day(BIZ_DATE)`）。
+18. 内存价格每周四北京时间 10:00 更新（cron `0 2 * * 4` UTC，`price-update.yml` → `update_price.py`）：读仓库内 `price_source.xlsx` / `内存价格跟进.xlsx`，只改 `memoryPrice`，历史价格列不覆盖；京东价格接口可用时自动补本周价，不可用则保留表格快照。
+19. 历史保留 30 天。
+20. 媒体源相关性"暂不收紧"（扩源但相关性卡严，后续可能再收紧）。
 
 ## 网址输出约定
 
