@@ -212,6 +212,29 @@
     font-variant-numeric:tabular-nums;
   }
   .rc-body{font-size:14px; color:#374151;}
+  /* 周/月总结：分点展示，句首市场名加粗，总括句高亮（文字内容不变） */
+  .rv-points{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .rv-point{
+    display:flex; align-items:flex-start; gap:10px;
+    background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:9px 12px; font-size:13px; line-height:1.7; color:#374151;
+  }
+  .rv-num{
+    flex:none; width:22px; height:22px; margin-top:1px; border-radius:7px;
+    background:#eef2ff; color:#1d4ed8; font-size:11px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums;
+  }
+  .rv-txt{flex:1; min-width:0;}
+  .rv-subs{list-style:none; margin:6px 0 0; padding:0 0 0 2px; display:flex; flex-direction:column; gap:3px;}
+  .rv-subs li{position:relative; padding-left:14px; font-size:12.5px; color:#4b5563; line-height:1.65;}
+  .rv-subs li::before{content:''; position:absolute; left:2px; top:9px; width:5px; height:5px; border-radius:50%; background:#93c5fd;}
+  .rv-lead{font-weight:800; color:var(--ink);}
+  .rv-point.rv-concl{
+    background:linear-gradient(135deg,#eff6ff,#f5f3ff);
+    border-color:#c7d2fe; color:#1e3a8a; font-weight:600;
+  }
+  .rv-point.rv-concl .rv-num{background:#2563eb; color:#fff;}
+  .rv-point.rv-concl .rv-lead{color:#1e3a8a;}
 
   /* ───── 术语注释 & 弹窗 ───── */
   .term{border-bottom:1px dotted #2563eb; cursor:help; position:relative; color:#1e3a8a;}
@@ -5245,10 +5268,48 @@
         reviewCard('月总结', m.period, m.summary)+
       '</div>';
   }
+  // 将总结原文按句拆成要点：长句再按逗号细分；总括句（整体看/横向看…）单独标记高亮。
+  // 只做展示拆分，原文一字不改（标点也保留）。
+  const RV_CONCL = /^(整体看|整体来看|横向看|横向来看|总体看|总体来看|总的来看|综上|总之|总而言之)/;
+  const RV_MKTS = ['存储市场','Token市场','算力市场','京东政企板块','京东政企'];
+  function reviewPoints(summary){
+    const s = String(summary||'').trim();
+    if(!s) return [];
+    const sentences = s.match(/[^。！？\n]+[。！？]?/g) || [s];
+    return sentences.map(sen=>{
+      const t = sen.trim();
+      if(!t) return null;
+      const concl = RV_CONCL.test(t);
+      const clauses = (t.match(/[^，,]+[，,]?/g) || [t]).map(c=>c.trim()).filter(Boolean);
+      // 含 3 个及以上分句的长句：首分句作主要点，其余作子要点（保持原文与顺序）
+      if(clauses.length >= 3){
+        return {lead:clauses[0], subs:clauses.slice(1), concl:concl};
+      }
+      return {lead:t, subs:[], concl:concl};
+    }).filter(Boolean);
+  }
   function reviewCard(title, period, summary){
+    const pts = reviewPoints(summary);
+    let body;
+    if(!pts.length){
+      body = '<span class="empty">暂无</span>';
+    }else{
+      body = '<ul class="rv-points">'+pts.map((p,i)=>{
+        const mk = RV_MKTS.find(m => p.lead.indexOf(m) === 0);
+        const leadHtml = mk
+          ? '<b class="rv-lead">'+annotate(mk)+'</b>'+annotate(p.lead.slice(mk.length))
+          : annotate(p.lead);
+        const subs = p.subs.length
+          ? '<ul class="rv-subs">'+p.subs.map(s=>'<li>'+annotate(s)+'</li>').join('')+'</ul>'
+          : '';
+        const num = (i+1) < 10 ? '0'+(i+1) : String(i+1);
+        return '<li class="rv-point'+(p.concl?' rv-concl':'')+'">'+
+          '<span class="rv-num">'+num+'</span><span class="rv-txt">'+leadHtml+subs+'</span></li>';
+      }).join('')+'</ul>';
+    }
     return '<div class="review-card"><div class="rc-head">'+title+'</div>'+
       (period?'<div class="rc-period">'+escapeHtml(period)+'</div>':'')+
-      '<div class="rc-body">'+(summary?annotate(summary):'<span class="empty">暂无</span>')+'</div></div>';
+      '<div class="rc-body">'+body+'</div></div>';
   }
 
   function renderGlossary(){
