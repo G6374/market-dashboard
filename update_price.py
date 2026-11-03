@@ -266,6 +266,64 @@ def try_online_snapshot(mp):
     return mp, True
 
 
+# ───────────────────── 本机抓取快照合并（每周四自动） ─────────────────────
+SNAPSHOT = "price_snapshot.json"
+
+
+def merge_snapshot(mp, path=SNAPSHOT):
+    """把本机抓取产出的 price_snapshot.json 合并为最新一期价格列。
+
+    - 只按 SKU 精确匹配写入，不按位置猜测；
+    - 没抓到的型号该期留 None（前端显示「—」），绝不拿旧价冒充新价；
+    - 同一日期重复合并幂等，不会重复追加列；
+    - 快照文件里只有价格数字，不含任何京东登录态。
+    """
+    if not os.path.isfile(path):
+        return mp, False
+    try:
+        snap = json.load(open(path, encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print(f"  [抓取快照] 读取失败（{e}），忽略")
+        return mp, False
+    date = str(snap.get("date") or "").strip()
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
+        print("  [抓取快照] date 非法，忽略")
+        return mp, False
+    got = {}
+    for k, v in (snap.get("prices") or {}).items():
+        try:
+            p = float(v)
+        except (TypeError, ValueError):
+            continue
+        if p >= 20:                     # 与抓取脚本一致：低价视为解码异常
+            got[str(k)] = p
+    if not got:
+        print("  [抓取快照] 无有效价格，忽略")
+        return mp, False
+
+    weeks = list(mp["weeks"])
+    if date in weeks:
+        idx = weeks.index(date)
+    else:
+        weeks.append(date)
+        idx = len(weeks) - 1
+        for it in mp["items"]:
+            it["prices"] = list(it["prices"]) + [None] * (len(weeks) - len(it["prices"]))
+    filled = 0
+    for it in mp["items"]:
+        while len(it["prices"]) <= idx:
+            it["prices"].append(None)
+        sku = sku_of(it.get("link"))
+        if sku and sku in got:
+            it["prices"][idx] = got[sku]
+            filled += 1
+    mp["weeks"] = weeks
+    mp["source"] = ("京东登录态自动抓取 · 每周四 10:00 同步"
+                    "（本期 %d/%d 款有价，未抓到显示「—」）" % (filled, len(mp["items"])))
+    print(f"  [抓取快照] 合并 {date}：{filled}/{len(mp['items'])} 款有价，其余显示「—」")
+    return mp, True
+
+
 # ─────────────────────────── 数据块读写 ───────────────────────────
 def load_block():
     html = open(INDEX, encoding="utf-8").read()
@@ -293,6 +351,10 @@ def validate(mp):
         if len(it.get("prices") or []) != n:
             raise RuntimeError(f"items[{i}] 价格列数 {len(it.get('prices') or [])} != 周数 {n}")
         for p in it["prices"]:
+            if p is None:
+                # 本期该型号未被抓到（京东风控/登录态），前端显示「—」；
+                # 绝不拿上一期价格冒充本期价格。
+                continue
             if not isinstance(p, (int, float)) or p < 0:
                 raise RuntimeError(f"items[{i}] 存在非法价格 {p}")
         lk = it.get("link") or ""
@@ -317,19 +379,29 @@ def main():
     if not xlsx:
         xlsx = next((p for p in XLSX_CANDIDATES if os.path.isfile(p)), "")
     mp = None
-    if xlsx:
-        print(f"  读取表格：{xlsx}")
-        mp = read_xlsx(xlsx)
+    if args.xlsx and os.path.isfile(args.xlsx):
+        # 显式指定表格时以表格为准（人工修复入口）
+        print(f"  读取指定表格：{args.xlsx}")
+        mp = read_xlsx(args.xlsx)
         print(f"  解析结果：{len(mp['weeks'])} 期 / {len(mp['items'])} 款，最新 {mp['weeks'][-1]}")
     elif data.get("memoryPrice"):
-        print("  仓库中未发现 xlsx 表格，沿用现有 memoryPrice 数据")
+        # 关键：以 index.html 现有数据为基准累积，保留全部历史期。
+        # 若每次都从 xlsx 重建，会丢掉本机同步上来的新一期价格。
+        print(f"  基准：index.html 现有 memoryPrice（{len(data['memoryPrice']['weeks'])} 期，保留全部历史）")
         mp = json.loads(json.dumps(data["memoryPrice"]))
+    elif xlsx:
+        print(f"  首次初始化，读取表格：{xlsx}")
+        mp = read_xlsx(xlsx)
+        print(f"  解析结果：{len(mp['weeks'])} 期 / {len(mp['items'])} 款，最新 {mp['weeks'][-1]}")
     else:
         print("  既无 xlsx 表格也无现有数据，本次不改动 index.html")
         return
 
     if not args.no_fetch:
-        mp, _ = try_online_snapshot(mp)
+        # 优先合并本机抓取快照；没有快照时才尝试公开价格接口探测
+        mp, snap_ok = merge_snapshot(mp)
+        if not snap_ok:
+            mp, _ = try_online_snapshot(mp)
 
     validate(mp)
     data["memoryPrice"] = mp
