@@ -859,7 +859,9 @@ def quality_gate(data, html):
                 ps = it.get("prices")
                 if not isinstance(ps, list) or len(ps) != n:
                     mp_err.append(f"items[{i}] 价格列数不符"); break
-                if any((not isinstance(p, (int, float)) or p < 0) for p in ps):
+                # None = 本期该型号未被抓到（前端显示「—」），属合法值；
+                # 绝不拿上一期价格冒充本期价格。
+                if any((p is not None and (not isinstance(p, (int, float)) or p < 0)) for p in ps):
                     mp_err.append(f"items[{i}] 价格非法"); break
                 lk = it.get("link") or ""
                 if lk and not lk.startswith("https://"):
