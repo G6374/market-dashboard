@@ -691,21 +691,44 @@ def period_summaries(data, start, end):
 def is_last_day(d):
     return (d + datetime.timedelta(days=1)).month != d.month
 
+def _period_end(period):
+    m = re.search(r"(\d{4}-\d{2}-\d{2})\s*$", period or "")
+    return m.group(1) if m else ""
+
+def _push_period(review, list_key, period, end, summary, keep=12):
+    """维护周/月总结历史归档：同一周期去重覆盖，按结束日升序，保留最近 keep 期。"""
+    arr = [x for x in (review.get(list_key) or []) if x.get("period") != period]
+    arr.append({"period": period, "end": end, "summary": summary})
+    arr.sort(key=lambda x: x.get("end") or _period_end(x.get("period")))
+    review[list_key] = arr[-keep:]
+
 def build_review(data):
     review = next((s for s in data["sections"] if s.get("type") == "review"), None)
     if not review:
         return
+    # 兼容旧数据：没有归档时用现有最新一期初始化
+    for lk, sk in (("weeks", "weekly"), ("months", "monthly")):
+        if not isinstance(review.get(lk), list) and review.get(sk):
+            one = review[sk]
+            review[lk] = [{"period": one.get("period", ""), "end": _period_end(one.get("period", "")),
+                           "summary": one.get("summary", "")}]
     if BIZ_DATE.weekday() == 6:
         end = BIZ_DATE
         start = end - datetime.timedelta(days=6)
         sums = period_summaries(data, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
         if sums:
-            review["weekly"] = {"period": f"{start} 至 {end}", "summary": synthesize_review("周", start, end, sums)}
+            period = f"{start} 至 {end}"
+            text = synthesize_review("周", start, end, sums)
+            review["weekly"] = {"period": period, "summary": text}
+            _push_period(review, "weeks", period, end.strftime("%Y-%m-%d"), text)
     if is_last_day(BIZ_DATE):
         start = BIZ_DATE.replace(day=1)
         sums = period_summaries(data, start.strftime("%Y-%m-%d"), BIZ_DATE.strftime("%Y-%m-%d"))
         if sums:
-            review["monthly"] = {"period": f"{start} 至 {BIZ_DATE}", "summary": synthesize_review("月", start, BIZ_DATE, sums)}
+            period = f"{start} 至 {BIZ_DATE}"
+            text = synthesize_review("月", start, BIZ_DATE, sums)
+            review["monthly"] = {"period": period, "summary": text}
+            _push_period(review, "months", period, BIZ_DATE.strftime("%Y-%m-%d"), text)
 
 def _review_cleanup(txt):
     t = (txt or "").strip()
@@ -827,14 +850,20 @@ def quality_gate(data, html):
     if not has_review:
         critical_fail.append("review 板块缺失，周报/月报无处安放")
 
-    # C2. 周/月总结必须是可读中文散文（拒绝 JSON 碎片 / 空行退化等乱码）
+    # C2. 周/月总结必须是可读中文散文（拒绝 JSON 碎片 / 空行退化等乱码）；
+    #     历史归档 weeks/months 中每一期同样必须合格（前端按所选日期展示历史期）。
     rev = next((s for s in data["sections"] if s.get("type") == "review"), None)
     bad_rev = []
     for key in ("weekly", "monthly"):
         txt = ((rev or {}).get(key) or {}).get("summary", "")
         if txt and not _review_prose_ok(_review_cleanup(txt)):
             bad_rev.append(key)
-    checks.append(("周/月总结为可读中文散文（无乱码/JSON碎片）", not bad_rev, True))
+    for key in ("weeks", "months"):
+        for i, item in enumerate((rev or {}).get(key) or []):
+            txt = (item or {}).get("summary", "")
+            if txt and not _review_prose_ok(_review_cleanup(txt)):
+                bad_rev.append(f"{key}[{item.get('period') or i}]")
+    checks.append(("周/月总结（含历史归档）均为可读中文散文", not bad_rev, True))
     if bad_rev:
         critical_fail.append("总结内容不合格（疑似乱码/JSON碎片）: " + ",".join(bad_rev))
 
