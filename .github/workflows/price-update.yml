@@ -1,0 +1,35 @@
+name: 内存价格变化每周更新
+on:
+  schedule:
+    - cron: "0 2 * * 4"       # UTC 周四 02:00 = 北京时间每周四 10:00
+  workflow_dispatch:           # 支持手动触发测试
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 说明数据源状态
+        run: |
+          echo "云端定时运行，不依赖任何本地电脑。"
+          echo "数据源优先级：仓库内 price_source.xlsx / 内存价格跟进.xlsx → price_data.json → 京东在线价格接口（可选）"
+          ls -l price_source.xlsx price_data.json 2>/dev/null || true
+      - name: 解析表格并写回看板（仅改 memoryPrice）
+        run: python update_price.py
+      - name: 提交更新
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html price_data.json
+          if git diff --cached --quiet; then
+            echo "本期无新数据，跳过提交（历史价格列保持不变）"
+          else
+            git commit -m "内存价格每周更新 $(date +%F)"
+            git push
+          fi
