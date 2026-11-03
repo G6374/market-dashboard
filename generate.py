@@ -844,6 +844,32 @@ def quality_gate(data, html):
     if not no_price:
         critical_fail.append("priceModule 重新出现")
 
+    # B2. 内存价格变化模块（存储市场页内）：数据合法 + 前端渲染代码存在；不得退回独立价格页
+    mp = data.get("memoryPrice")
+    mp_err = []
+    if mp is not None:
+        weeks, mitems = mp.get("weeks"), mp.get("items")
+        if not isinstance(weeks, list) or not weeks:
+            mp_err.append("weeks 缺失")
+        elif not isinstance(mitems, list) or not mitems:
+            mp_err.append("items 缺失")
+        else:
+            n = len(weeks)
+            for i, it in enumerate(mitems):
+                ps = it.get("prices")
+                if not isinstance(ps, list) or len(ps) != n:
+                    mp_err.append(f"items[{i}] 价格列数不符"); break
+                if any((not isinstance(p, (int, float)) or p < 0) for p in ps):
+                    mp_err.append(f"items[{i}] 价格非法"); break
+                lk = it.get("link") or ""
+                if lk and not lk.startswith("https://"):
+                    mp_err.append(f"items[{i}] 链接非法"); break
+    mp_ui = ("renderMemoryPrice" in html) and ("mp-table" in html) and ('data-tab="storage"' in html)
+    mp_ok = (not mp_err) and mp_ui
+    checks.append(("内存价格变化模块位于存储市场页（数据合法 + 渲染代码存在）", mp_ok, True))
+    if not mp_ok:
+        critical_fail.append("内存价格变化模块异常: " + (",".join(mp_err) if mp_err else "前端渲染代码缺失"))
+
     # C. 总结区存在（承载周报/月报）
     has_review = any(s.get("type") == "review" for s in data["sections"])
     checks.append(("总结区(review)存在，可承载周报/月报", has_review, True))
