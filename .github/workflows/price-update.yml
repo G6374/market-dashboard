@@ -1,7 +1,10 @@
 name: 内存价格变化每周更新
 on:
+  push:
+    paths:
+      - 'price_snapshot.json'  # 本机抓价完成后提交快照 → 立即合并并部署
   schedule:
-    - cron: "0 2 * * 4"       # UTC 周四 02:00 = 北京时间每周四 10:00
+    - cron: "0 2 * * 4"       # UTC 周四 02:00 = 北京时间每周四 10:00（兜底）
   workflow_dispatch:           # 支持手动触发测试
 permissions:
   contents: write
@@ -17,9 +20,9 @@ jobs:
           python-version: "3.11"
       - name: 说明数据源状态
         run: |
-          echo "云端定时运行，不依赖任何本地电脑。"
-          echo "数据源优先级：仓库内 price_source.xlsx / 内存价格跟进.xlsx → price_data.json → 京东在线价格接口（可选）"
-          ls -l price_source.xlsx price_data.json 2>/dev/null || true
+          echo "云端执行：读取本机同步上来的 price_snapshot.json，合并进看板并部署。"
+          echo "数据源优先级：price_snapshot.json（本机登录态抓取）→ index.html 现有 memoryPrice（累积历史）→ price_source.xlsx（仅首次初始化）"
+          ls -l price_snapshot.json price_source.xlsx price_data.json 2>/dev/null || true
       - name: 解析表格并写回看板（仅改 memoryPrice）
         run: python update_price.py
       - name: 提交更新
