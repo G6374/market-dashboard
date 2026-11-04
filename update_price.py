@@ -289,6 +289,11 @@ def merge_snapshot(mp, path=SNAPSHOT):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
         print("  [抓取快照] date 非法，忽略")
         return mp, False
+    weeks0 = list(mp.get("weeks") or [])
+    if weeks0 and date < weeks0[-1] and date not in weeks0:
+        # 防回灌：仓库里残留的旧快照绝不能把已经回滚/不存在的历史期重新合并进来
+        print(f"  [抓取快照] 快照日期 {date} 早于最新一期 {weeks0[-1]}，判定为过期快照，忽略")
+        return mp, False
     got = {}
     for k, v in (snap.get("prices") or {}).items():
         try:
