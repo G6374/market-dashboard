@@ -407,7 +407,7 @@
 <script type="application/json" id="market-data">{
   "meta": {
     "title": "市场动态看板",
-    "updatedAt": "2026-11-06",
+    "updatedAt": "2026-11-07",
     "isPrototype": false,
     "prototypeNote": "每日北京时间 24:00（次日 00:00）自动更新；数据来自各厂商官网 Newsroom 与权威行业媒体（TrendForce 等）官方来源，严格只收录当日发布的资讯。周总结每周日 24:00 生成，月总结每月最后一天 24:00 生成；历史保留 30 天。"
   },
@@ -1723,6 +1723,87 @@
               "excerpt": "",
               "vendor": "",
               "region": "domestic"
+            }
+          ],
+          "channels": [
+            {
+              "name": "三星 Samsung Newsroom",
+              "url": "https://news.samsung.com/global/",
+              "region": "foreign"
+            },
+            {
+              "name": "SK 海力士",
+              "url": "https://news.skhynix.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "美光 Micron",
+              "url": "https://www.micron.com/about/newsroom",
+              "region": "foreign"
+            },
+            {
+              "name": "西部数据 Western Digital",
+              "url": "https://blog.westerndigital.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "铠侠 Kioxia",
+              "url": "https://www.kioxia.com/en-us/",
+              "region": "foreign"
+            },
+            {
+              "name": "TrendForce 集邦咨询",
+              "url": "https://www.trendforce.com/news/",
+              "region": "foreign"
+            },
+            {
+              "name": "长江存储 YMTC",
+              "url": "https://www.ymtc.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "长鑫存储 CXMT",
+              "url": "https://www.cxmt.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "兆易创新",
+              "url": "https://www.gigadevice.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "澜起科技",
+              "url": "https://www.montage-tech.com/",
+              "region": "domestic"
+            }
+          ]
+        },
+        "2026-11-07": {
+          "summary": "国外：当日国外存储市场动态主要围绕产能布局与需求结构变化展开。一方面，Solidigm 考虑在美国建设 NAND 闪存工厂，但资金问题尚未明朗，反映国际厂商在产能扩张上的审慎态度；另一方面，三星向 DB 集团出售约 300 台芯片制造设备，显示其产线调整与资源再配置正在进行。此外，云端大模型推动 KV 缓存需求激增，为固态硬盘（SSD）发展指明三大方向，预示数据中心存储需求将成为影响供需关系的重要变量。",
+          "items": [
+            {
+              "title": "Solidigm 考虑在美国建设 NAND 闪存工厂，资金问题仍待明朗",
+              "source": "DIGITIMES 电子时报",
+              "url": "https://www.digitimes.com/news/a20261106PD229/solidigm-fab-nand-flash-nand-funding.html",
+              "excerpt": "Solidigm 正评估在美国新建 NAND 闪存制造工厂的可能性，但相关融资方案尚未确定。该动向涉及国际 NAND 产能布局，若落地可能影响未来供需格局，目前仍处于早期筹划阶段。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "三星据报向 DB 集团出售 300 台芯片制造设备",
+              "source": "DIGITIMES 电子时报",
+              "url": "https://www.digitimes.com/news/a20261106VL218/samsung-equipment-manufacturing-production-capacity-production.html",
+              "excerpt": "三星据报将约 300 台芯片制造设备出售给 DB 集团，涉及生产设备与产能调整。此举反映三星在存储芯片产线配置上的资源再分配，可能对其制造能力与供应节奏产生间接影响。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "DIGITIMES 洞察：云端大模型推动 KV 缓存需求激增，确立固态硬盘三大发展方向",
+              "source": "DIGITIMES 电子时报",
+              "url": "https://www.digitimes.com/news/a20261104PD239/ssd-demand-development-llm-data-center.html",
+              "excerpt": "云端大语言模型（LLM）的广泛应用带动 KV 缓存需求大幅上升，进而推高数据中心对固态硬盘（SSD）的依赖。报告指出 SSD 发展将围绕三个关键方向展开，显示数据中心存储需求正成为影响 NAND 供需关系的重要力量。",
+              "vendor": "",
+              "region": "foreign"
             }
           ],
           "channels": [
@@ -3985,6 +4066,131 @@
               "region": "domestic"
             }
           ]
+        },
+        "2026-11-07": {
+          "summary": "国外：当日国外 Token 市场动态主要围绕大模型厂商的资本运作与模型能力展开。OpenAI 完成新一轮大规模融资，估值显著抬升，显示头部模型厂商的资金聚集效应仍在延续。与此同时，开源模型在编程等任务上的表现持续逼近闭源模型，开放与闭源之间的能力差距进一步收窄。此外，围绕模型推理部署的开源工具也在完善，为 API 服务提供更可控的底层支撑。\n国内：当日国内 Token 市场动态中，与国产大模型 API 计费直接相关的信息集中在豆包工作个人版取消 5 小时额度限制，显示头部厂商在调用配额与使用门槛上继续放宽。其余条目分别涉及 Agent 工具链竞争、海外 AI 初创公司人事变动及 AI 内容变现，与国产大模型 API 价格、新模型发布和费率变动的关联度较低。整体看，当日板块以使用额度调整为主要看点，未见新的模型发布或费率上调信息。",
+          "items": [
+            {
+              "title": "OpenAI 据报以 1.25 万亿美元估值再融资 110 亿美元",
+              "source": "TechCrunch AI",
+              "url": "https://techcrunch.com/2026/11/06/openai-reportedly-raises-an-additional-11-billion-at-a-1-25-trillion-valuation/",
+              "excerpt": "OpenAI 据报完成新一轮 110 亿美元融资，公司估值达到 1.25 万亿美元。如此规模的资金注入，通常用于支撑大模型训练、推理算力与 API 服务扩张。对普通用户而言，这意味着主流模型 API 的供给能力和迭代节奏有望继续得到资本保障。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "开放与闭源 AI 模型在网络攻防能力上的差距持续缩小",
+              "source": "The Decoder（AI 媒体）",
+              "url": "https://the-decoder.com/the-gap-between-open-and-closed-ai-models-in-cyber-capabilities-keeps-shrinking/",
+              "excerpt": "报道指出，开放模型与闭源模型在网络攻防相关能力上的差距正在不断缩小。这意味着开源模型在部分专业任务上已能接近主流闭源模型的表现。对于依赖 API 的开发者而言，模型选择空间扩大，成本与能力之间的权衡将更加灵活。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "OpenAI 完成 110 亿美元融资，但还需向牙医等群体募集更多资金",
+              "source": "The Decoder（AI 媒体）",
+              "url": "https://the-decoder.com/openai-lands-an-11-billion-funding-round-but-has-to-court-dentists-for-more-capital/",
+              "excerpt": "OpenAI 完成 110 亿美元融资，同时报道称其仍在向牙医等非传统投资群体募集资金。这反映出头部模型厂商在巨额算力投入下对资金的持续需求。融资进展将间接影响其模型研发与 API 服务的长期供给。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "Ripple-65B 预览版以完全 Apache 2.0 开源美国模型身份展现强劲智能体编程能力",
+              "source": "The Decoder（AI 媒体）",
+              "url": "https://the-decoder.com/ripple-65b-preview-delivers-strong-agentic-coding-results-as-a-fully-apache-2-0-open-us-model/",
+              "excerpt": "Ripple-65B 预览版以完全 Apache 2.0 许可开源，在智能体编程任务上取得较强结果。作为美国开源模型，它为开发者提供了闭源 API 之外的可自部署选择。此类模型的出现，有助于降低对单一商业 API 的依赖。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "Buoyant 发布 Kinference：面向 Kubernetes 与 vLLM 的开源推理控制平面",
+              "source": "Marktechpost（AI 媒体）",
+              "url": "https://www.marktechpost.com/2026/11/07/buoyant-kinference-open-source-inference-control-plane-kubernetes-vllm/",
+              "excerpt": "Buoyant 发布开源推理控制平面 Kinference，面向 Kubernetes 与 vLLM 环境。该工具用于管理和调度模型推理服务，属于 API 服务底层基础设施的一环。对希望自建推理服务的团队而言，这类开源组件可提升部署的可控性与效率。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "9点1氪丨豆包工作个人版取消5小时额度限制；人类低温纪录被打破；美科技股反弹，SpaceX市值一夜暴涨9653亿",
+              "source": "36氪（科技媒体）",
+              "url": "https://36kr.com/p/4058997417563266?f=rss",
+              "excerpt": "豆包工作个人版宣布取消 5 小时额度限制，意味着个人用户在使用该产品时的调用频次约束进一步放宽。该调整属于国产大模型相关产品的使用配额变化，对关注 API 与 Token 计费的用户具有直接参考意义。其余内容涉及科学纪录与海外科技股行情，与国内 Token 市场关联较弱。",
+              "vendor": "",
+              "region": "domestic"
+            }
+          ],
+          "channels": [
+            {
+              "name": "OpenAI 官方（GPT）",
+              "url": "https://openai.com/news",
+              "region": "foreign"
+            },
+            {
+              "name": "Anthropic 官方（Claude）",
+              "url": "https://www.anthropic.com/news",
+              "region": "foreign"
+            },
+            {
+              "name": "Google 官方博客（Gemini）",
+              "url": "https://blog.google/technology/ai/",
+              "region": "foreign"
+            },
+            {
+              "name": "微软 Azure 官方博客",
+              "url": "https://azure.microsoft.com/en-us/blog/",
+              "region": "foreign"
+            },
+            {
+              "name": "Meta AI 官方博客",
+              "url": "https://ai.meta.com/blog/",
+              "region": "foreign"
+            },
+            {
+              "name": "Mistral AI 官方",
+              "url": "https://mistral.ai/news",
+              "region": "foreign"
+            },
+            {
+              "name": "xAI 官方（Grok）",
+              "url": "https://x.ai/blog",
+              "region": "foreign"
+            },
+            {
+              "name": "Cohere 官方",
+              "url": "https://cohere.com/blog",
+              "region": "foreign"
+            },
+            {
+              "name": "百度智能云千帆（文心）",
+              "url": "https://cloud.baidu.com/product/wenxinworkshop",
+              "region": "domestic"
+            },
+            {
+              "name": "阿里云百炼（通义）",
+              "url": "https://bailian.aliyun.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "智谱 AI（GLM）",
+              "url": "https://open.bigmodel.cn/",
+              "region": "domestic"
+            },
+            {
+              "name": "月之暗面 Kimi",
+              "url": "https://kimi.moonshot.cn/",
+              "region": "domestic"
+            },
+            {
+              "name": "DeepSeek 深度求索",
+              "url": "https://www.deepseek.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "讯飞星火",
+              "url": "https://xinghuo.xfyun.cn/",
+              "region": "domestic"
+            }
+          ]
         }
       },
       "channels": [
@@ -5459,6 +5665,74 @@
               "region": "domestic"
             }
           ]
+        },
+        "2026-11-07": {
+          "summary": "国外：2026年11月7日，国外算力市场板块的动态主要围绕 NVIDIA 英伟达及其供应链展开。美国情报界传出涉及英伟达首席执行官黄仁勋的间谍风波，并已引发国会关注，相关报道同时牵涉到被指走私价值约20亿美元人工智能芯片的公司。此外，台积电（TSMC）否认应英伟达要求探索3D DRAM技术，显示先进存储技术距离市场化仍有数年时间。整体来看，当日信息以安全审查与供应链技术路线澄清为主，尚未出现新的产品发布或产能扩张消息。",
+          "items": [
+            {
+              "title": "因中国间谍阴谋报道，英伟达黄仁勋被正式传唤至国会",
+              "source": "Tom's Hardware（硬件媒体）",
+              "url": "https://www.tomshardware.com/tech-industry/big-tech/nvidias-jensen-huang-officially-called-to-congress-due-to-reports-of-a-chinese-spy-plot-officials-mention-growing-concerns-over-national-security",
+              "excerpt": "由于有关中国间谍阴谋的报道，英伟达首席执行官黄仁勋被正式传唤至美国国会。官员在传唤中提及对国家安全日益增长的担忧。该事件表明，算力芯片领域的国家安全审查正在从产品出口层面延伸至企业高管与供应链关联层面。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "台积电否认应英伟达要求探索3D DRAM",
+              "source": "Tom's Hardware（硬件媒体）",
+              "url": "https://www.tomshardware.com/pc-components/dram/tsmc-denies-exploring-3d-dram-at-nvidias-request-advanced-memory-tech-is-still-years-from-market-viability",
+              "excerpt": "台积电（TSMC）否认曾应英伟达要求探索3D DRAM技术。报道指出，这类先进存储技术距离具备市场可行性仍需数年时间。该表态有助于澄清市场对英伟达与台积电在下一代存储技术合作上的猜测，也说明相关算力存储方案短期内难以落地。",
+              "vendor": "",
+              "region": "foreign"
+            }
+          ],
+          "channels": [
+            {
+              "name": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "AMD 官方",
+              "url": "https://www.amd.com/en/newsroom.html",
+              "region": "foreign"
+            },
+            {
+              "name": "Intel 英特尔",
+              "url": "https://newsroom.intel.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "华为昇腾",
+              "url": "https://www.hiascend.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "寒武纪",
+              "url": "https://www.cambricon.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "摩尔线程",
+              "url": "https://www.mthreads.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "沐曦股份",
+              "url": "https://www.metax-tech.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "壁仞科技",
+              "url": "https://www.birentech.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "天数智芯",
+              "url": "https://www.iluvatar.com/",
+              "region": "domestic"
+            }
+          ]
         }
       },
       "channels": [
@@ -6185,6 +6459,42 @@
         },
         "2026-11-06": {
           "summary": "今日（2026-11-06）未检索到与「京东政企」高度相关的官方更新，可点击下方官方渠道持续关注。",
+          "items": [],
+          "channels": [
+            {
+              "name": "京东企业业务",
+              "url": "https://e.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东云",
+              "url": "https://www.jdcloud.com/",
+              "region": ""
+            },
+            {
+              "name": "京东",
+              "url": "https://www.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东黑板报（官方资讯）",
+              "url": "https://news.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东物流",
+              "url": "https://www.jdl.com/",
+              "region": ""
+            },
+            {
+              "name": "京东工业",
+              "url": "https://www.jd.com/",
+              "region": ""
+            }
+          ]
+        },
+        "2026-11-07": {
+          "summary": "今日（2026-11-07）未检索到与「京东政企」高度相关的官方更新，可点击下方官方渠道持续关注。",
           "items": [],
           "channels": [
             {
