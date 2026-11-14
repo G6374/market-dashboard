@@ -407,7 +407,7 @@
 <script type="application/json" id="market-data">{
   "meta": {
     "title": "市场动态看板",
-    "updatedAt": "2026-11-13",
+    "updatedAt": "2026-11-14",
     "isPrototype": false,
     "prototypeNote": "每日北京时间 24:00（次日 00:00）自动更新；数据来自各厂商官网 Newsroom 与权威行业媒体（TrendForce 等）官方来源，严格只收录当日发布的资讯。周总结每周日 24:00 生成，月总结每月最后一天 24:00 生成；历史保留 30 天。"
   },
@@ -2260,6 +2260,62 @@
               "region": "domestic"
             }
           ],
+          "channels": [
+            {
+              "name": "三星 Samsung Newsroom",
+              "url": "https://news.samsung.com/global/",
+              "region": "foreign"
+            },
+            {
+              "name": "SK 海力士",
+              "url": "https://news.skhynix.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "美光 Micron",
+              "url": "https://www.micron.com/about/newsroom",
+              "region": "foreign"
+            },
+            {
+              "name": "西部数据 Western Digital",
+              "url": "https://blog.westerndigital.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "铠侠 Kioxia",
+              "url": "https://www.kioxia.com/en-us/",
+              "region": "foreign"
+            },
+            {
+              "name": "TrendForce 集邦咨询",
+              "url": "https://www.trendforce.com/news/",
+              "region": "foreign"
+            },
+            {
+              "name": "长江存储 YMTC",
+              "url": "https://www.ymtc.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "长鑫存储 CXMT",
+              "url": "https://www.cxmt.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "兆易创新",
+              "url": "https://www.gigadevice.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "澜起科技",
+              "url": "https://www.montage-tech.com/",
+              "region": "domestic"
+            }
+          ]
+        },
+        "2026-11-14": {
+          "summary": "今日（2026-11-14）未检索到与「存储市场」高度相关的官方更新，可点击下方官方渠道持续关注。",
+          "items": [],
           "channels": [
             {
               "name": "三星 Samsung Newsroom",
@@ -5323,6 +5379,147 @@
               "region": "domestic"
             }
           ]
+        },
+        "2026-11-14": {
+          "summary": "国外：2026年11月14日，国际主流大模型生态在API计费、模型发布与功能扩展方面出现多项动态。OpenAI 推出 ChatGPT Wallet，将AI代理的购物与结账能力嵌入对话产品；Anthropic 一方面推进 Claude 在制造业的行业化API集成，另一方面其 Mythos 模型的重训练算力需求据称大幅降低。开源侧，斯坦福发布面向冻结大模型的记忆模块 Memorilla，Perplexity 更新开源决策模型 Decider v1.3，均与模型能力扩展及API调用效率相关。此外，AI视频生成模型的性能与价格对比信息更新，为多模态API选型提供参考。\n国内：当日国内大模型 API 领域出现两项值得关注的动向：DeepSeek 一次性开放覆盖多款模型的 API 接口，进一步降低开发者接入门槛；联想提出以绿电生产词元的「词元工厂」思路，将算力供给与 Token 产出直接关联。此外，一项被称为「史上最严」的湿实验预测基准发布，提示单纯堆叠推理算力未必能提升模型在科学任务上的表现，对 API 使用方的模型选型具有参考意义。",
+          "items": [
+            {
+              "title": "ChatGPT 推出全新钱包功能，AI 代理可代为购物与结账",
+              "source": "TechCrunch AI",
+              "url": "https://techcrunch.com/2026/11/13/chatgpts-new-wallet-lets-ai-agents-shop-and-check-out-for-you/",
+              "excerpt": "OpenAI 为 ChatGPT 新增钱包功能，使 AI 代理能够直接完成商品选购与支付结账。该功能将对话式AI从信息问答延伸至交易执行环节，可能改变用户通过API调用AI代理的计费与授权模式。对于开发者而言，这意味着基于 ChatGPT 的代理应用可集成更完整的商业闭环。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "OpenAI 重新分配机器人研究人员，通用模型或使专用机器人AI不再必要",
+              "source": "The Decoder（AI 媒体）",
+              "url": "https://the-decoder.com/openai-reassigns-robotics-researchers-to-other-teams-as-general-purpose-models-might-make-specialized-robotics-ai-unnecessary/",
+              "excerpt": "OpenAI 将机器人团队的研究人员调往其他项目，反映出其判断通用大模型可能取代专用机器人AI。这一调整暗示未来机器人相关能力或更多通过通用模型API提供，而非独立训练专用模型。对API用户而言，通用模型的能力边界有望进一步扩展。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "前研究员称 Anthropic 已能以原算力的一小部分重训练 Mythos 模型",
+              "source": "The Decoder（AI 媒体）",
+              "url": "https://the-decoder.com/anthropic-can-already-retrain-mythos-with-a-fraction-of-the-compute-originally-needed-says-former-researcher-coxon/",
+              "excerpt": "前研究员 Coxon 表示，Anthropic 已能用远低于最初所需的算力重新训练 Mythos 模型。若属实，这将显著降低大模型迭代与微调的成本门槛，并可能影响未来API定价与模型更新频率。该信息也暗示模型训练效率正在快速提升。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "Anthropic 推出面向制造业的 Claude，将AI直接接入工厂软件以自动化工业流程",
+              "source": "The Decoder（AI 媒体）",
+              "url": "https://the-decoder.com/anthropics-claude-for-manufacturing-plugs-ai-directly-into-factory-software-to-automate-industrial-workflows/",
+              "excerpt": "Anthropic 发布面向制造业的 Claude 解决方案，可将AI直接嵌入工厂软件系统，实现工业工作流自动化。这是 Claude 在行业化API集成方面的重要扩展，意味着企业可通过API将大模型能力接入生产环境。该动向与API功能更新及行业落地高度相关。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "斯坦福开源 Memorilla：面向冻结大模型的潜在记忆模块",
+              "source": "Marktechpost（AI 媒体）",
+              "url": "https://www.marktechpost.com/2026/11/14/stanford-memorilla-memory-system-16-memory-tokens/",
+              "excerpt": "斯坦福研究团队开源了 Memorilla，一种为冻结的大语言模型提供潜在记忆能力的模块。该模块可在不重新训练模型的情况下扩展其记忆与上下文处理能力，对API调用中的长上下文与记忆管理具有参考价值。开源属性也便于开发者评估与集成。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "「史上最严」湿实验预测基准发布：推理拉满、算力翻五倍仍难奏效",
+              "source": "量子位（AI 媒体）",
+              "url": "https://www.qbitai.com/2026/11/510232.html",
+              "excerpt": "该基准针对湿实验预测任务设计，被称为「史上最严」，用于检验模型在真实科学场景中的推理能力。测试结果显示，即便把推理强度拉满、算力提升至五倍，模型表现也未见明显改善。这提示开发者在调用大模型 API 处理专业科学任务时，不能仅靠增加算力投入，还需关注模型本身的能力边界。",
+              "vendor": "",
+              "region": "domestic"
+            },
+            {
+              "title": "绿电进、Token 出：联想重新定义词元工厂",
+              "source": "量子位（AI 媒体）",
+              "url": "https://www.qbitai.com/2026/11/510094.html",
+              "excerpt": "联想提出「词元工厂」概念，将绿色电力输入与 Token 产出直接对应，强调算力基础设施与 Token 供给的一体化。该思路把 Token 生产视为可规模化、可计量的工业过程，为理解大模型 API 背后的成本结构提供了新视角。对使用国产大模型 API 的用户而言，这意味着未来 Token 价格可能与能源供给方式更紧密相关。",
+              "vendor": "",
+              "region": "domestic"
+            },
+            {
+              "title": "突发：DeepSeek 开放全家桶 API",
+              "source": "量子位（AI 媒体）",
+              "url": "https://www.qbitai.com/2026/11/510003.html",
+              "excerpt": "DeepSeek 当日宣布开放「全家桶」API，即一次性提供旗下多款模型的接口调用能力。此举降低了开发者接入其模型的门槛，也意味着国产大模型 API 市场的竞争进一步加剧。对于关注计费与 Token 价格的用户，后续需留意其具体费率与调用限制的官方说明。",
+              "vendor": "",
+              "region": "domestic"
+            }
+          ],
+          "channels": [
+            {
+              "name": "OpenAI 官方（GPT）",
+              "url": "https://openai.com/news",
+              "region": "foreign"
+            },
+            {
+              "name": "Anthropic 官方（Claude）",
+              "url": "https://www.anthropic.com/news",
+              "region": "foreign"
+            },
+            {
+              "name": "Google 官方博客（Gemini）",
+              "url": "https://blog.google/technology/ai/",
+              "region": "foreign"
+            },
+            {
+              "name": "微软 Azure 官方博客",
+              "url": "https://azure.microsoft.com/en-us/blog/",
+              "region": "foreign"
+            },
+            {
+              "name": "Meta AI 官方博客",
+              "url": "https://ai.meta.com/blog/",
+              "region": "foreign"
+            },
+            {
+              "name": "Mistral AI 官方",
+              "url": "https://mistral.ai/news",
+              "region": "foreign"
+            },
+            {
+              "name": "xAI 官方（Grok）",
+              "url": "https://x.ai/blog",
+              "region": "foreign"
+            },
+            {
+              "name": "Cohere 官方",
+              "url": "https://cohere.com/blog",
+              "region": "foreign"
+            },
+            {
+              "name": "百度智能云千帆（文心）",
+              "url": "https://cloud.baidu.com/product/wenxinworkshop",
+              "region": "domestic"
+            },
+            {
+              "name": "阿里云百炼（通义）",
+              "url": "https://bailian.aliyun.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "智谱 AI（GLM）",
+              "url": "https://open.bigmodel.cn/",
+              "region": "domestic"
+            },
+            {
+              "name": "月之暗面 Kimi",
+              "url": "https://kimi.moonshot.cn/",
+              "region": "domestic"
+            },
+            {
+              "name": "DeepSeek 深度求索",
+              "url": "https://www.deepseek.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "讯飞星火",
+              "url": "https://xinghuo.xfyun.cn/",
+              "region": "domestic"
+            }
+          ]
         }
       },
       "channels": [
@@ -7369,6 +7566,82 @@
               "region": "domestic"
             }
           ]
+        },
+        "2026-11-14": {
+          "summary": "国外：2026年11月14日，国外算力市场动态主要围绕监管与合规问题展开。美国财政部长对NVIDIA 英伟达是否知情向空壳公司出售AI GPU提出质疑，强调企业自身应承担责任；同时有研究指出DeepSeek、Kimi等中国AI模型可能使用了受出口管制的NVIDIA 英伟达Blackwell GPU进行训练。此外，NVIDIA 英伟达诞生地丹尼餐厅的纪念牌因黄仁勋相关争议被移除，反映出企业声誉事件对历史纪念的影响。",
+          "items": [
+            {
+              "title": "美国财政部长质疑NVIDIA 英伟达是否知情向空壳公司出售AI GPU，称企业自身应负责",
+              "source": "Tom's Hardware（硬件媒体）",
+              "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/u-s-treasury-secretary-questions-whether-nvidia-knowingly-sold-ai-gpus-to-shell-companies-says-company-itself-is-responsible-i-think-it-is-important-that-anyone-at-the-company-there-be-held-accountable-for-that",
+              "excerpt": "美国财政部长公开质疑NVIDIA 英伟达是否在知情情况下向空壳公司出售AI GPU，并强调公司内部相关人员应为此承担责任。这一表态凸显出美国政府对高端AI芯片流向监管的持续关注，可能对NVIDIA 英伟达的合规审查与市场声誉带来压力。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "研究人员称DeepSeek、Kimi等中国AI模型使用被禁的NVIDIA 英伟达Blackwell GPU训练",
+              "source": "Tom's Hardware（硬件媒体）",
+              "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/researchers-allege-deepseek-kimi-and-other-chinese-ai-models-were-trained-on-export-controlled-nvidia-blackwell-chips-statistical-analysis-on-model-weights-reveals-high-correlation-to-nvidia-hardware",
+              "excerpt": "有研究人员通过统计分析模型权重，指控DeepSeek、Kimi等中国AI模型在训练中使用了受出口管制的NVIDIA 英伟达Blackwell芯片。该指控若被证实，可能加剧美国对华技术出口管制的执法争议，并影响相关AI企业的合规风险。",
+              "vendor": "",
+              "region": "foreign"
+            },
+            {
+              "title": "NVIDIA 英伟达诞生地丹尼餐厅纪念牌因黄仁勋争议被移除",
+              "source": "Tom's Hardware（硬件媒体）",
+              "url": "https://www.tomshardware.com/tech-industry/commemorative-plaque-at-dennys-booth-where-nvidia-was-born-has-been-removed-sign-removed-in-wake-of-jensens-scandals-marked-the-booth-that-launched-a-usd1-trillion-company",
+              "excerpt": "位于丹尼餐厅、标记NVIDIA 英伟达诞生地的纪念牌已被移除，此举与黄仁勋相关争议有关。该纪念牌曾象征这家万亿美元市值公司的起点，其移除反映出企业领导人争议事件对历史纪念与品牌形象的影响。",
+              "vendor": "",
+              "region": "foreign"
+            }
+          ],
+          "channels": [
+            {
+              "name": "NVIDIA 英伟达",
+              "url": "https://nvidianews.nvidia.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "AMD 官方",
+              "url": "https://www.amd.com/en/newsroom.html",
+              "region": "foreign"
+            },
+            {
+              "name": "Intel 英特尔",
+              "url": "https://newsroom.intel.com/",
+              "region": "foreign"
+            },
+            {
+              "name": "华为昇腾",
+              "url": "https://www.hiascend.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "寒武纪",
+              "url": "https://www.cambricon.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "摩尔线程",
+              "url": "https://www.mthreads.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "沐曦股份",
+              "url": "https://www.metax-tech.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "壁仞科技",
+              "url": "https://www.birentech.com/",
+              "region": "domestic"
+            },
+            {
+              "name": "天数智芯",
+              "url": "https://www.iluvatar.com/",
+              "region": "domestic"
+            }
+          ]
         }
       },
       "channels": [
@@ -8347,6 +8620,42 @@
         },
         "2026-11-13": {
           "summary": "今日（2026-11-13）未检索到与「京东政企」高度相关的官方更新，可点击下方官方渠道持续关注。",
+          "items": [],
+          "channels": [
+            {
+              "name": "京东企业业务",
+              "url": "https://e.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东云",
+              "url": "https://www.jdcloud.com/",
+              "region": ""
+            },
+            {
+              "name": "京东",
+              "url": "https://www.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东黑板报（官方资讯）",
+              "url": "https://news.jd.com/",
+              "region": ""
+            },
+            {
+              "name": "京东物流",
+              "url": "https://www.jdl.com/",
+              "region": ""
+            },
+            {
+              "name": "京东工业",
+              "url": "https://www.jd.com/",
+              "region": ""
+            }
+          ]
+        },
+        "2026-11-14": {
+          "summary": "今日（2026-11-14）未检索到与「京东政企」高度相关的官方更新，可点击下方官方渠道持续关注。",
           "items": [],
           "channels": [
             {
