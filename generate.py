@@ -955,6 +955,16 @@ def main():
         print("ERROR: 未找到 MARKET-DATA 区块"); sys.exit(1)
     data = json.loads(m.group(2))
 
+    # 双时段调度幂等保护：主时段(北京24:00)与兜底时段(北京次日06:30)归属同一天。
+    # 若目标日期四个板块数据已齐且 updatedAt 已更新，说明主时段已成功完成，
+    # 直接跳过抓取，避免重复消耗 LLM 或覆盖主时段结果。
+    news_secs = [s for s in data["sections"] if "dates" in s]
+    if (news_secs
+            and all(BIZ_STR in s.get("dates", {}) for s in news_secs)
+            and data.get("meta", {}).get("updatedAt") == BIZ_STR):
+        print(f"== {BIZ_STR} 数据已完整存在，跳过抓取（双时段幂等）==")
+        return
+
     print(f"== 目标更新日期（北京时间 24:00 运行）：{BIZ_STR} ==")
 
     # 存储 / Token / 算力：分 国外 / 国内 两组
