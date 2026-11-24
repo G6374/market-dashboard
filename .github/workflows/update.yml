@@ -1,7 +1,10 @@
 name: 市场动态看板每日更新
 on:
   schedule:
-    - cron: "0 16 * * *"      # UTC 16:00 = 北京时间 24:00（次日 00:00）
+    - cron: "0 16 * * *"      # 主时段：UTC 16:00 = 北京时间 24:00（次日 00:00）
+    - cron: "30 21 * * *"     # 兜底时段：UTC 21:30 = 北京时间次日 05:30
+                              # GitHub 在 UTC 整点常延迟或跳过调度；两时段归属同一天，
+                              # generate.py 有幂等保护，重复运行不会重复抓取或覆盖数据。
   workflow_dispatch:          # 支持手动触发测试
 permissions:
   contents: write
