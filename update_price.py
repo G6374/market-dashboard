@@ -29,6 +29,7 @@ import xml.etree.ElementTree as ET
 
 INDEX = "index.html"
 PRICE_JSON = "price_data.json"
+KEEP_WEEKS = 8   # 看板只保留最近 8 期（近八周）价格数据
 XLSX_CANDIDATES = [
     "price_source.xlsx", "内存价格跟进.xlsx",
     os.path.join("data", "price_source.xlsx"), os.path.join("data", "内存价格跟进.xlsx"),
@@ -329,6 +330,20 @@ def merge_snapshot(mp, path=SNAPSHOT):
     return mp, True
 
 
+# ─────────────────────────── 只保留最近 N 期 ───────────────────────────
+def trim_weeks(mp, keep=KEEP_WEEKS):
+    """裁剪为最近 keep 期（近八周），weeks 与每条 prices 同步截断。"""
+    weeks = mp.get("weeks") or []
+    if len(weeks) <= keep:
+        return mp, False
+    start = len(weeks) - keep
+    mp["weeks"] = list(weeks[start:])
+    for it in mp["items"]:
+        it["prices"] = list(it.get("prices") or [])[start:]
+    print(f"  [裁剪] {len(weeks)} 期 → {keep} 期，保留 {mp['weeks'][0]} ~ {mp['weeks'][-1]}")
+    return mp, True
+
+
 # ─────────────────────────── 数据块读写 ───────────────────────────
 def load_block():
     html = open(INDEX, encoding="utf-8").read()
@@ -372,6 +387,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--xlsx", default="")
     ap.add_argument("--no-fetch", action="store_true")
+    ap.add_argument("--keep", type=int, default=KEEP_WEEKS, help="保留最近 N 期（默认 8）")
     args = ap.parse_args()
 
     html, m, data = load_block()
@@ -407,6 +423,9 @@ def main():
         mp, snap_ok = merge_snapshot(mp)
         if not snap_ok:
             mp, _ = try_online_snapshot(mp)
+
+    # 只保留最近 8 期（近八周），每次更新都执行，确保以后也不会无限累积
+    mp, _ = trim_weeks(mp, keep=args.keep)
 
     validate(mp)
     data["memoryPrice"] = mp
